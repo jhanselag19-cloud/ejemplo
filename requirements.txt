@@ -1,0 +1,10 @@
+asgiref==3.12.1
+Django==5.1.15
+et_xmlfile==2.0.0
+gunicorn==26.2.0
+openpyxl==3.1.5
+pillow==12.3.0
+python-dotenv==1.2.4
+qrcode==8.2
+sqlparse==0.6.0
+whitenoise==6.12.0

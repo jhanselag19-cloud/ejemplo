@@ -1,0 +1,21 @@
+[1mdiff --git a/dockerfile b/dockerfile[m
+[1mindex 6ce10cd..bbb8efa 100644[m
+[1m--- a/dockerfile[m
+[1m+++ b/dockerfile[m
+[36m@@ -25,6 +25,9 @@[m [mRUN pip install --upgrade pip && \[m
+ # Copiamos el resto del proyecto[m
+ COPY . .[m
+ [m
+[32m+[m[32m# Ejecutamos las migraciones durante la construcción para que se cree la base de datos SQLite con las tablas[m
+[32m+[m[32mRUN python manage.py migrate[m
+[32m+[m
+ # Usuario no root por seguridad[m
+ RUN adduser --disabled-password --gecos "" appuser && \[m
+     chown -R appuser:appuser /app[m
+[36m@@ -32,4 +35,4 @@[m [mUSER appuser[m
+ [m
+ EXPOSE 8000[m
+ [m
+[31m-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "config.wsgi:application"][m
+[32m+[m[32mCMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:10000 config.wsgi:application"][m
+\ No newline at end of file[m
