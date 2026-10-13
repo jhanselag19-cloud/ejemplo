@@ -34,5 +34,4 @@ RUN adduser --disabled-password --gecos "" appuser && \
 USER appuser
 
 EXPOSE 8000
-
-sh -c "python manage.py migrate --noinput && python manage.py createsuperuser --noinput || true; gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+CMD ["sh", "-c", "python manage.py migrate --noinput && (python manage.py createsuperuser --noinput || true) && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
