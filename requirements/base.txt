@@ -3,3 +3,4 @@ python-dotenv
 qrcode[pil]
 openpyxl
 gunicorn
+whitenoise>=6.6
