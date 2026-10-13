@@ -35,4 +35,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn --bind 0.0.0.0:10000 config.wsgi:application"]
+sh -c "python manage.py migrate --noinput && python manage.py createsuperuser --noinput || true; gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
