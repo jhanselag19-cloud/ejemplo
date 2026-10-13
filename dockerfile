@@ -25,6 +25,9 @@ RUN pip install --upgrade pip && \
 # Copiamos el resto del proyecto
 COPY . .
 
+# Ejecutamos las migraciones durante la construcción para que se cree la base de datos SQLite con las tablas
+
+
 # Usuario no root por seguridad
 RUN adduser --disabled-password --gecos "" appuser && \
     chown -R appuser:appuser /app
@@ -32,4 +35,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "config.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:10000 config.wsgi:application"]
