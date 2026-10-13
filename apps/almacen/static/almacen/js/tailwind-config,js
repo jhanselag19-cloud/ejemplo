@@ -1,0 +1,50 @@
+// ============================================================
+// Configuración global de Tailwind para TOMTOM Almacén
+// Un solo lugar, todos los templates heredan.
+// ============================================================
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                // Paleta corporativa explícita (para templates nuevos)
+                corporate: {
+                    navy:   '#1B2A4A',
+                    navy2:  '#24365C',
+                    navy3:  '#2E4370',
+                    red:    '#E30613',
+                    red2:   '#B90510',
+                    light:  '#F4F5F7',
+                    border: '#E5E7EB',
+                },
+                // ✅ Sobrescribimos "teal" con los azules del logo
+                //    Así TODOS los templates viejos se actualizan solos.
+                teal: {
+                    50:  '#E8EBF2',
+                    100: '#D1D7E3',
+                    200: '#A6B0C6',
+                    300: '#7A8AA9',
+                    400: '#4F638C',
+                    500: '#2E4370',
+                    600: '#24365C',
+                    700: '#1B2A4A',
+                    800: '#151F37',
+                    900: '#0E1626',
+                },
+                // ✅ El rojo ya coincide con el rojo corporativo, pero
+                //    lo dejamos afinado por si acaso.
+                red: {
+                    50:  '#FDEAEC',
+                    100: '#FBD5D8',
+                    200: '#F5AAB1',
+                    300: '#EE7F89',
+                    400: '#E75462',
+                    500: '#E30613',
+                    600: '#B90510',
+                    700: '#8C040C',
+                    800: '#5F0308',
+                    900: '#320104',
+                },
+            },
+        },
+    },
+};

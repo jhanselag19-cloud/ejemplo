@@ -1,0 +1,840 @@
+{% extends "almacen/base.html" %}
+{% load l10n %}
+
+{% block title %}Reportes - Almacén{% endblock %}
+{% block breadcrumb %}Reportes{% endblock %}
+
+{% block content %}
+<div class="w-full">
+    
+    <!-- ✅ ID para identificar el contenido a exportar -->
+    <div id="reporte-contenido" class="bg-white">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+        <div>
+            <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Información para decidir</p>
+            <h1 class="text-3xl font-bold text-gray-800">Reportes</h1>
+            <p class="text-gray-500 mt-1">Una visión clara del valor y la actividad de tu almacén.</p>
+        </div>
+        
+        <!-- ✅ no-print: estos botones NO aparecen en el PDF -->
+        <div class="no-print flex flex-wrap gap-3 w-full md:w-auto">
+            <button type="button" 
+                    onclick="window.print()"
+                    class="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+            </button>
+            <button type="button"
+                    id="btn-exportar-pdf"
+                    class="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                <i data-lucide="download" class="w-4 h-4"></i> <span id="btn-exportar-texto">Exportar informe</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ✅ no-print: las tabs NO aparecen en el PDF -->
+    <div class="no-print flex gap-2 mb-6 border-b border-gray-200">
+        <a href="?tab=valoracion" 
+           class="px-5 py-2.5 -mb-px border-b-2 text-sm font-medium transition
+                  {% if tab == 'valoracion' %}border-teal-700 text-teal-700{% else %}border-transparent text-gray-500 hover:text-gray-800{% endif %}">
+            Valoración
+        </a>
+        <a href="?tab=movimientos" 
+           class="px-5 py-2.5 -mb-px border-b-2 text-sm font-medium transition
+                  {% if tab == 'movimientos' %}border-teal-700 text-teal-700{% else %}border-transparent text-gray-500 hover:text-gray-800{% endif %}">
+            Movimientos
+        </a>
+        <a href="?tab=auditoria" 
+           class="px-5 py-2.5 -mb-px border-b-2 text-sm font-medium transition
+                  {% if tab == 'auditoria' %}border-teal-700 text-teal-700{% else %}border-transparent text-gray-500 hover:text-gray-800{% endif %}">
+            Auditoría
+        </a>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: VALORACIÓN                                                  -->
+    <!-- ================================================================= -->
+    {% if tab == 'valoracion' %}
+
+    <!-- ============================================================ -->
+    <!-- TARJETAS DE RESUMEN                                          -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+
+        <!-- Total del inventario -->
+        <div class="bg-gradient-to-br from-teal-700 to-teal-800 text-white rounded-xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider opacity-80">Valor total del inventario</p>
+                <i data-lucide="wallet" class="w-5 h-5 opacity-80"></i>
+            </div>
+            <p class="text-3xl font-bold">{{ total_global|floatformat:2 }}</p>
+            <p class="text-xs opacity-75 mt-2">
+                {{ total_productos_global }} producto{{ total_productos_global|pluralize }} en {{ total_areas_global }} área{{ total_areas_global|pluralize }}
+            </p>
+        </div>
+
+        <!-- Área con mayor valor -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Área más valiosa</p>
+                <i data-lucide="trending-up" class="w-5 h-5 text-teal-600"></i>
+            </div>
+            {% if area_top %}
+                <p class="text-2xl font-bold text-gray-800 truncate" title="{{ area_top.nombre }}">{{ area_top.nombre }}</p>
+                <p class="text-sm text-teal-700 font-semibold mt-2">{{ area_top.valoracion|floatformat:2 }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ area_top.productos }} producto{{ area_top.productos|pluralize }} · {{ area_top.porcentaje|floatformat:1 }}% del total</p>
+            {% else %}
+                <p class="text-sm text-gray-400">Sin datos</p>
+            {% endif %}
+        </div>
+
+        <!-- Área con menor valor -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Área con menor valor</p>
+                <i data-lucide="trending-down" class="w-5 h-5 text-orange-500"></i>
+            </div>
+            {% if area_bottom %}
+                <p class="text-2xl font-bold text-gray-800 truncate" title="{{ area_bottom.nombre }}">{{ area_bottom.nombre }}</p>
+                <p class="text-sm text-orange-600 font-semibold mt-2">{{ area_bottom.valoracion|floatformat:2 }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ area_bottom.productos }} producto{{ area_bottom.productos|pluralize }} · {{ area_bottom.porcentaje|floatformat:1 }}% del total</p>
+            {% else %}
+                <p class="text-sm text-gray-400">Sin datos</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- GRÁFICAS                                                     -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Gráfica de barras: Valor por área -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Comparativa de valor por área</h2>
+            </div>
+            <div class="relative h-72">
+                <canvas id="grafica-barras"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfica de dona: Distribución -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="pie-chart" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Distribución</h2>
+            </div>
+            <div class="relative h-72">
+                <canvas id="grafica-dona"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TABLA DETALLADA                                              -->
+    <!-- ============================================================ -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="table" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Valor del inventario por área</h2>
+            </div>
+            <span class="text-lg font-bold text-teal-700">{{ total_global|floatformat:2 }}</span>
+        </div>
+
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3">Área</th>
+                    <th class="px-6 py-3">Código</th>
+                    <th class="px-6 py-3 text-right">Productos</th>
+                    <th class="px-6 py-3 text-right">Valoración</th>
+                    <th class="px-6 py-3 text-right">% del total</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for fila in filas_valoracion %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ fila.color }};"></span>
+                            <span class="text-gray-800 font-medium">{{ fila.nombre }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4"><span class="text-gray-600 font-mono text-xs">{{ fila.codigo }}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="text-gray-700">{{ fila.productos }}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="font-semibold text-gray-800">{{ fila.valoracion|floatformat:2 }}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full" style="width: {{ fila.porcentaje|floatformat:0 }}%; background-color: {{ fila.color }};"></div>
+                            </div>
+                            <span class="text-xs font-medium text-gray-600 w-12 text-right">{{ fila.porcentaje|floatformat:1 }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-6 py-12 text-center text-gray-400">No hay datos de valoración para mostrar.</td></tr>
+                {% endfor %}
+            </tbody>
+            {% if filas_valoracion %}
+            <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                <tr>
+                    <td class="px-6 py-4 font-bold text-gray-800">Total</td>
+                    <td class="px-6 py-4"></td>
+                    <td class="px-6 py-4 text-right font-bold text-gray-800">{{ total_productos_global }}</td>
+                    <td class="px-6 py-4 text-right font-bold text-teal-700">{{ total_global|floatformat:2 }}</td>
+                    <td class="px-6 py-4 text-right font-bold text-gray-800">100%</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: MOVIMIENTOS                                                 -->
+    <!-- ================================================================= -->
+    {% if tab == 'movimientos' %}
+
+    <!-- ============================================================ -->
+    <!-- FILTRO DE FECHAS                                             -->
+    <!-- ============================================================ -->
+    <div class="no-print bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <form method="get" class="flex flex-col md:flex-row gap-4 items-end">
+            <input type="hidden" name="tab" value="movimientos">
+            
+            <div class="w-full md:w-48">
+                <label for="desde" class="block text-xs font-medium text-gray-600 mb-2">Desde</label>
+                <input type="date" name="desde" id="desde" value="{{ fecha_desde }}"
+                       class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+
+            <div class="w-full md:w-48">
+                <label for="hasta" class="block text-xs font-medium text-gray-600 mb-2">Hasta</label>
+                <input type="date" name="hasta" id="hasta" value="{{ fecha_hasta }}"
+                       class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+
+            <button type="submit" class="px-6 py-2.5 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                Aplicar
+            </button>
+        </form>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TARJETAS DE RESUMEN DE MOVIMIENTOS                           -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+
+        <!-- Total de movimientos -->
+        <div class="bg-gradient-to-br from-teal-700 to-teal-800 text-white rounded-xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider opacity-80">Total de movimientos</p>
+                <i data-lucide="arrow-right-left" class="w-5 h-5 opacity-80"></i>
+            </div>
+            <p class="text-3xl font-bold">{{ total_movimientos_global }}</p>
+            <p class="text-xs opacity-75 mt-2">
+                {{ total_entradas_global }} entradas · {{ total_salidas_global }} salidas
+            </p>
+        </div>
+
+        <!-- Área más activa -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Área más activa</p>
+                <i data-lucide="activity" class="w-5 h-5 text-teal-600"></i>
+            </div>
+            {% if area_mas_activa %}
+                <p class="text-2xl font-bold text-gray-800 truncate" title="{{ area_mas_activa.nombre }}">{{ area_mas_activa.nombre }}</p>
+                <p class="text-sm text-teal-700 font-semibold mt-2">{{ area_mas_activa.total_mov }} movimiento{{ area_mas_activa.total_mov|pluralize }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ area_mas_activa.porcentaje|floatformat:1 }}% del total</p>
+            {% else %}
+                <p class="text-sm text-gray-400">Sin datos</p>
+            {% endif %}
+        </div>
+
+        <!-- Área menos activa -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Área menos activa</p>
+                <i data-lucide="activity" class="w-5 h-5 text-orange-500"></i>
+            </div>
+            {% if area_menos_activa %}
+                <p class="text-2xl font-bold text-gray-800 truncate" title="{{ area_menos_activa.nombre }}">{{ area_menos_activa.nombre }}</p>
+                <p class="text-sm text-orange-600 font-semibold mt-2">{{ area_menos_activa.total_mov }} movimiento{{ area_menos_activa.total_mov|pluralize }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ area_menos_activa.porcentaje|floatformat:1 }}% del total</p>
+            {% else %}
+                <p class="text-sm text-gray-400">Sin datos</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- GRÁFICAS DE MOVIMIENTOS                                      -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Gráfica de barras agrupadas: Entradas vs Salidas por área -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Comparativa de entradas y salidas por área</h2>
+            </div>
+            <div class="relative h-72">
+                <canvas id="grafica-movimientos-barras"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfica de dona: Distribución de movimientos -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="pie-chart" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Distribución</h2>
+            </div>
+            <div class="relative h-72">
+                <canvas id="grafica-movimientos-dona"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TABLA DETALLADA                                              -->
+    <!-- ============================================================ -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="table" class="w-5 h-5 text-teal-600"></i>
+                <h2 class="font-bold text-gray-800">Entradas y salidas por área</h2>
+            </div>
+            <span class="text-lg font-bold text-teal-700">{{ total_movimientos_global }} mov.</span>
+        </div>
+
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3">Área</th>
+                    <th class="px-6 py-3">Código</th>
+                    <th class="px-6 py-3 text-right">Productos</th>
+                    <th class="px-6 py-3 text-right">Entradas</th>
+                    <th class="px-6 py-3 text-right">Salidas</th>
+                    <th class="px-6 py-3 text-right">% del total</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for fila in filas_movimientos %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ fila.color }};"></span>
+                            <span class="text-gray-800">{{ fila.nombre }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4"><span class="text-gray-600 font-mono text-xs">{{ fila.codigo }}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="text-gray-700">{{ fila.productos }}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="font-semibold text-teal-700">{{ fila.entradas }}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="font-semibold text-orange-600">{{ fila.salidas }}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full" style="width: {{ fila.porcentaje|floatformat:0 }}%; background-color: {{ fila.color }};"></div>
+                            </div>
+                            <span class="text-xs font-medium text-gray-600 w-12 text-right">{{ fila.porcentaje|floatformat:1 }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No hay movimientos en el rango seleccionado.</td></tr>
+                {% endfor %}
+            </tbody>
+            {% if filas_movimientos %}
+            <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                <tr>
+                    <td class="px-6 py-4 font-bold text-gray-800">Total</td>
+                    <td class="px-6 py-4"></td>
+                    <td class="px-6 py-4 text-right font-bold text-gray-800">—</td>
+                    <td class="px-6 py-4 text-right font-bold text-teal-700">{{ total_entradas_global }}</td>
+                    <td class="px-6 py-4 text-right font-bold text-orange-600">{{ total_salidas_global }}</td>
+                    <td class="px-6 py-4 text-right font-bold text-gray-800">100%</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: AUDITORÍA                                                   -->
+    <!-- ================================================================= -->
+    {% if tab == 'auditoria' %}
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center gap-2">
+            <i data-lucide="clipboard-check" class="w-5 h-5 text-teal-600"></i>
+            <h2 class="font-bold text-gray-800">Control físico de inventario</h2>
+        </div>
+
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3">Producto</th>
+                    <th class="px-6 py-3 text-right">Stock sistema</th>
+                    <th class="px-6 py-3 text-right">Conteo físico</th>
+                    <th class="px-6 py-3 text-right">Diferencia</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for fila in filas_auditoria %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-gray-800">{{ fila.nombre }}</p>
+                        <p class="text-xs text-gray-400 font-mono">{{ fila.sku }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-right"><span class="font-semibold text-gray-800">{{ fila.stock_sistema }}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <input type="number" 
+                               step="1"
+                               data-stock="{{ fila.stock_sistema|unlocalize }}"
+                               class="conteo-fisico w-32 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-teal-500"
+                               placeholder="0">
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <span class="text-gray-400 diferencia-value">—</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">No hay productos activos para auditar.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    </div><!-- Cierre del div #reporte-contenido -->
+
+</div>
+
+<script>
+    // =====================================================================
+    // CÁLCULO DE DIFERENCIA EN AUDITORÍA
+    // =====================================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.conteo-fisico').forEach(function (input) {
+            input.addEventListener('input', function () {
+                const stockSistema = parseFloat(this.dataset.stock) || 0;
+                const fila = this.closest('tr');
+                const celdaDiferencia = fila.querySelector('.diferencia-value');
+                const valorInput = this.value;
+
+                if (valorInput === '') {
+                    celdaDiferencia.textContent = '—';
+                    celdaDiferencia.className = 'text-gray-400 diferencia-value';
+                    return;
+                }
+
+                const conteoFisico = parseFloat(valorInput) || 0;
+                const diferencia = conteoFisico - stockSistema;
+
+                let texto, clase;
+                if (diferencia > 0) {
+                    texto = '+' + diferencia.toFixed(0);
+                    clase = 'text-teal-600 font-semibold diferencia-value';
+                } else if (diferencia < 0) {
+                    texto = diferencia.toFixed(0);
+                    clase = 'text-red-600 font-semibold diferencia-value';
+                } else {
+                    texto = '0';
+                    clase = 'text-gray-600 diferencia-value';
+                }
+
+                celdaDiferencia.textContent = texto;
+                celdaDiferencia.className = clase;
+            });
+        });
+    });
+
+    // =====================================================================
+    // EXPORTAR A PDF
+    // =====================================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnExportar = document.getElementById('btn-exportar-pdf');
+        const btnTexto = document.getElementById('btn-exportar-texto');
+
+        if (!btnExportar) return;
+
+        btnExportar.addEventListener('click', function () {
+            
+            if (typeof html2pdf === 'undefined') {
+                alert('La librería para generar PDF aún no ha cargado. Espera un momento e intenta de nuevo.');
+                return;
+            }
+
+            const textoOriginal = btnTexto.textContent;
+            btnTexto.textContent = 'Generando PDF...';
+            btnExportar.disabled = true;
+            btnExportar.classList.add('opacity-75', 'cursor-not-allowed');
+
+            const elemento = document.getElementById('reporte-contenido');
+            const tabActual = '{{ tab }}';
+            const fecha = new Date().toISOString().slice(0, 10);
+            const nombreArchivo = `reporte-${tabActual}-${fecha}.pdf`;
+
+            const opciones = {
+                margin:       [10, 10, 10, 10],
+                filename:     nombreArchivo,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF:        { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
+            };
+
+            html2pdf()
+                .set(opciones)
+                .from(elemento)
+                .save()
+                .then(function () {
+                    btnTexto.textContent = textoOriginal;
+                    btnExportar.disabled = false;
+                    btnExportar.classList.remove('opacity-75', 'cursor-not-allowed');
+                    lucide.createIcons();
+                })
+                .catch(function (error) {
+                    console.error('Error al generar PDF:', error);
+                    btnTexto.textContent = textoOriginal;
+                    btnExportar.disabled = false;
+                    btnExportar.classList.remove('opacity-75', 'cursor-not-allowed');
+                    lucide.createIcons();
+                    alert('No se pudo generar el PDF. Intenta de nuevo.');
+                });
+        });
+    });
+
+    // =====================================================================
+    // GRÁFICAS DE VALORACIÓN (solo se ejecutan si estamos en esa tab)
+    // =====================================================================
+    {% if tab == 'valoracion' %}
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Datos desde Django
+        const areasLabels    = {{ areas_labels|safe }};
+        const areasValores   = {{ areas_valores|safe }};
+        const areasColores   = {{ areas_colores|safe }};
+
+        // Calcular total para porcentajes en tooltips
+        const totalValores = areasValores.reduce((a, b) => a + b, 0);
+
+        // ---------- GRÁFICA DE BARRAS (original, vertical) ----------
+        const canvasBarras = document.getElementById('grafica-barras');
+        if (canvasBarras) {
+            new Chart(canvasBarras, {
+                type: 'bar',
+                data: {
+                    labels: areasLabels,
+                    datasets: [{
+                        label: 'Valor del inventario',
+                        data: areasValores,
+                        backgroundColor: areasColores,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1B2A4A',
+                            padding: 10,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    const valor = context.parsed.y;
+                                    const pct = totalValores > 0 ? ((valor / totalValores) * 100).toFixed(1) : 0;
+                                    return [
+                                        'Valor: ' + valor.toLocaleString('es-VE', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
+                                        'Porcentaje: ' + pct + '%'
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('es-VE');
+                                },
+                                font: { size: 11 }
+                            },
+                            grid: { color: '#F3F4F6' }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 11 },
+                                maxRotation: 45,
+                                minRotation: 0,
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------- GRÁFICA DE DONA (con leyenda compacta) ----------
+        const canvasDona = document.getElementById('grafica-dona');
+        if (canvasDona) {
+            new Chart(canvasDona, {
+                type: 'doughnut',
+                data: {
+                    labels: areasLabels,
+                    datasets: [{
+                        data: areasValores,
+                        backgroundColor: areasColores,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                padding: 6,
+                                font: { size: 10 },
+                                color: '#4B5563',
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map(function(label, i) {
+                                            const value = data.datasets[0].data[i];
+                                            const pct = totalValores > 0 ? ((value / totalValores) * 100).toFixed(1) : 0;
+                                            const shortLabel = label.length > 22 ? label.substring(0, 20) + '…' : label;
+                                            return {
+                                                text: shortLabel + ' (' + pct + '%)',
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                strokeStyle: data.datasets[0].backgroundColor[i],
+                                                lineWidth: 0,
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1B2A4A',
+                            padding: 10,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    const valor = context.parsed;
+                                    const pct = totalValores > 0 ? ((valor / totalValores) * 100).toFixed(1) : 0;
+                                    return [
+                                        'Valor: ' + valor.toLocaleString('es-VE', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }),
+                                        'Porcentaje: ' + pct + '%'
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+    {% endif %}
+
+    // =====================================================================
+    // GRÁFICAS DE MOVIMIENTOS (solo se ejecutan si estamos en esa tab)
+    // =====================================================================
+    {% if tab == 'movimientos' %}
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Datos desde Django
+        const movAreasLabels    = {{ mov_areas_labels|safe }};
+        const movAreasEntradas  = {{ mov_areas_entradas|safe }};
+        const movAreasSalidas   = {{ mov_areas_salidas|safe }};
+        const movAreasColores   = {{ mov_areas_colores|safe }};
+        const movAreasTotales   = {{ mov_areas_totales|safe }};
+
+        // Total para porcentajes
+        const totalMov = movAreasTotales.reduce((a, b) => a + b, 0);
+
+        // ---------- GRÁFICA DE BARRAS AGRUPADAS ----------
+        const canvasMovBarras = document.getElementById('grafica-movimientos-barras');
+        if (canvasMovBarras) {
+            new Chart(canvasMovBarras, {
+                type: 'bar',
+                data: {
+                    labels: movAreasLabels,
+                    datasets: [
+                        {
+                            label: 'Entradas',
+                            data: movAreasEntradas,
+                            backgroundColor: '#1B2A4A',
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'Salidas',
+                            data: movAreasSalidas,
+                            backgroundColor: '#E30613',
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                padding: 12,
+                                font: { size: 11, weight: '500' },
+                                color: '#374151',
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1B2A4A',
+                            padding: 10,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' mov.';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 11 }
+                            },
+                            grid: { color: '#F3F4F6' }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 11 },
+                                maxRotation: 45,
+                                minRotation: 0,
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------- GRÁFICA DE DONA (Distribución de movimientos) ----------
+        const canvasMovDona = document.getElementById('grafica-movimientos-dona');
+        if (canvasMovDona) {
+            new Chart(canvasMovDona, {
+                type: 'doughnut',
+                data: {
+                    labels: movAreasLabels,
+                    datasets: [{
+                        data: movAreasTotales,
+                        backgroundColor: movAreasColores,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                padding: 6,
+                                font: { size: 10 },
+                                color: '#4B5563',
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map(function(label, i) {
+                                            const value = data.datasets[0].data[i];
+                                            const pct = totalMov > 0 ? ((value / totalMov) * 100).toFixed(1) : 0;
+                                            const shortLabel = label.length > 22 ? label.substring(0, 20) + '…' : label;
+                                            return {
+                                                text: shortLabel + ' (' + pct + '%)',
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                strokeStyle: data.datasets[0].backgroundColor[i],
+                                                lineWidth: 0,
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1B2A4A',
+                            padding: 10,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    const valor = context.parsed;
+                                    const pct = totalMov > 0 ? ((valor / totalMov) * 100).toFixed(1) : 0;
+                                    return [
+                                        'Movimientos: ' + valor,
+                                        'Porcentaje: ' + pct + '%'
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

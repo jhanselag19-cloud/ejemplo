@@ -1,0 +1,94 @@
+{% extends "almacen/base.html" %}
+{% load static %}
+
+{% block title %}Iniciar sesión - Nexo{% endblock %}
+{% block breadcrumb %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div class="min-h-full flex items-center justify-center py-12">
+    <div class="w-full max-w-md">
+
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+            <!-- ✅ Logo corporativo -->
+            <div class="flex justify-center mb-4">
+                <img src="{% static 'almacen/img/logo1.png' %}" 
+                     alt="Proyectos & Desarrollos TOMTOM" 
+                     class="w-32 h-auto object-contain">
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Bienvenido</h1>
+            <p class="text-sm text-gray-500 mt-1">SISTEMA INTEGRAL DE CONTROL Y SEGUIMIENTO</p>
+        </div>
+
+        <!-- Card del formulario -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+
+            {% if form.errors %}
+                <div class="flex items-start gap-3 bg-red-50 text-red-700 text-sm p-3 rounded-lg border border-red-200 mb-6">
+                    <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span>Usuario o contraseña incorrectos. Inténtalo de nuevo.</span>
+                </div>
+            {% endif %}
+
+            {% if next and user.is_authenticated %}
+                <div class="bg-yellow-50 text-yellow-700 text-sm p-3 rounded-lg border border-yellow-200 mb-6">
+                    Tu cuenta no tiene acceso a esta página. Inicia sesión con otra cuenta.
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+
+                <!-- Usuario -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Usuario
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="user" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text"
+                               name="{{ form.username.name }}"
+                               id="{{ form.username.id_for_label }}"
+                               value="{{ form.username.value|default:'' }}"
+                               placeholder="Ingresa tu usuario"
+                               autofocus
+                               required
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="password"
+                               name="{{ form.password.name }}"
+                               id="{{ form.password.id_for_label }}"
+                               placeholder="Ingresa tu contraseña"
+                               required
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                    </div>
+                </div>
+
+                <!-- Botón -->
+                <button type="submit"
+                        class="w-full flex items-center justify-center gap-2 bg-teal-700 text-white py-2.5 rounded-lg font-medium hover:bg-teal-800 transition">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    Iniciar sesión
+                </button>
+
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+            </form>
+        </div>
+
+        <p class="text-center text-xs text-gray-400 mt-6">
+            © {% now "Y" %} Sistema de Gestión de Almacén
+        </p>
+    </div>
+</div>
+{% endblock %}

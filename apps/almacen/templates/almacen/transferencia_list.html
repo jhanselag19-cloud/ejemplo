@@ -1,0 +1,214 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}Transferencias - Almacén{% endblock %}
+{% block breadcrumb %}Transferencias{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+        <div>
+            <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Movimiento entre áreas</p>
+            <h1 class="text-3xl font-bold text-gray-800">Transferencias</h1>
+            <p class="text-gray-500 mt-1">Mueve productos entre áreas de tu almacén.</p>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+            <a href="{% url 'almacen:transferencia_create' %}" 
+               class="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nueva transferencia
+            </a>
+        </div>
+    </div>
+
+    <!-- Contadores -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        
+        <a href="{% url 'almacen:transferencia_list' %}" 
+           class="bg-white rounded-xl border {% if not request.GET.estado %}border-teal-500 ring-1 ring-teal-500{% else %}border-gray-200{% endif %} p-4 flex items-center gap-3 hover:border-teal-300 transition">
+            <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 flex-shrink-0">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">Total</p>
+                <p class="text-xl font-bold text-gray-800">{{ total_transferencias }}</p>
+            </div>
+        </a>
+
+        <a href="?estado=borrador" 
+           class="bg-white rounded-xl border {% if request.GET.estado == 'borrador' %}border-orange-500 ring-1 ring-orange-500{% else %}border-gray-200{% endif %} p-4 flex items-center gap-3 hover:border-orange-300 transition">
+            <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 flex-shrink-0">
+                <i data-lucide="pencil" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">Borradores</p>
+                <p class="text-xl font-bold text-gray-800">{{ borradores }}</p>
+            </div>
+        </a>
+
+        <a href="?estado=confirmada" 
+           class="bg-white rounded-xl border {% if request.GET.estado == 'confirmada' %}border-teal-500 ring-1 ring-teal-500{% else %}border-gray-200{% endif %} p-4 flex items-center gap-3 hover:border-teal-300 transition">
+            <div class="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">Confirmadas</p>
+                <p class="text-xl font-bold text-gray-800">{{ confirmadas }}</p>
+            </div>
+        </a>
+
+        <a href="?estado=anulada" 
+           class="bg-white rounded-xl border {% if request.GET.estado == 'anulada' %}border-red-500 ring-1 ring-red-500{% else %}border-gray-200{% endif %} p-4 flex items-center gap-3 hover:border-red-300 transition">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
+                <i data-lucide="x-circle" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">Anuladas</p>
+                <p class="text-xl font-bold text-gray-800">{{ anuladas }}</p>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        
+        <!-- Filtros -->
+        <div class="p-4 border-b border-gray-200 bg-white">
+            <form method="get" class="flex flex-col md:flex-row gap-3">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}" 
+                           placeholder="Buscar por número, motivo o área..." 
+                           class="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <button type="submit" class="px-6 py-2.5 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                    Buscar
+                </button>
+                {% if request.GET.q %}
+                <a href="{% url 'almacen:transferencia_list' %}" class="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                    Limpiar
+                </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Tabla -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4">Número</th>
+                        <th class="px-6 py-4">Fecha</th>
+                        <th class="px-6 py-4">Origen → Destino</th>
+                        <th class="px-6 py-4">Productos</th>
+                        <th class="px-6 py-4">Estado</th>
+                        <th class="px-6 py-4">Creado por</th>
+                        <th class="px-6 py-4 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for t in transferencias %}
+                    <tr class="hover:bg-gray-50 transition">
+                        
+                        <td class="px-6 py-4">
+                            <p class="font-mono text-xs font-bold text-gray-800">{{ t.numero }}</p>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <p class="font-medium text-gray-800">{{ t.fecha_transferencia|date:"d/m/Y" }}</p>
+                            <p class="text-xs text-gray-400">{{ t.fecha_transferencia|date:"H:i" }}</p>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="text-gray-800 font-medium">{{ t.area_origen.nombre|truncatechars:20 }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3 text-gray-400 flex-shrink-0"></i>
+                                <span class="text-teal-700 font-medium">{{ t.area_destino.nombre|truncatechars:20 }}</span>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {% with det=t.detalles.first %}
+                                {% if det %}
+                                    <p class="font-medium text-gray-800">{{ det.producto.nombre|truncatechars:25 }}</p>
+                                    <p class="text-xs text-gray-400">{{ t.detalles.count }} producto{{ t.detalles.count|pluralize }}</p>
+                                {% else %}
+                                    <span class="text-gray-400">—</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {% if t.estado == 'borrador' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Borrador
+                                </span>
+                            {% elif t.estado == 'confirmada' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Confirmada
+                                </span>
+                            {% elif t.estado == 'anulada' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Anulada
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700">{{ t.creado_por.get_full_name|default:t.creado_por.username|default:"—" }}</span>
+                        </td>
+
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'almacen:transferencia_detail' t.numero %}" 
+                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-teal-700 hover:bg-teal-50 transition" 
+                               title="Ver detalle">
+                                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                                    <i data-lucide="shuffle" class="w-8 h-8 text-teal-600"></i>
+                                </div>
+                                <p class="text-lg font-medium text-gray-700 mb-1">Sin transferencias registradas</p>
+                                <p class="text-sm text-gray-400 mb-4">Empieza moviendo productos entre áreas.</p>
+                                <a href="{% url 'almacen:transferencia_create' %}" 
+                                   class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Crear primera transferencia
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+            <p class="text-sm text-gray-500">
+                Página <span class="font-medium text-gray-700">{{ page_obj.number }}</span> 
+                de <span class="font-medium text-gray-700">{{ page_obj.paginator.num_pages }}</span>
+            </p>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
+                       class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-white transition">Anterior</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
+                       class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-white transition">Siguiente</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

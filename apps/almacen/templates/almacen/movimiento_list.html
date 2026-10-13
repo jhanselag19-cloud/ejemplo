@@ -1,0 +1,226 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}Movimientos - Almacén{% endblock %}
+{% block breadcrumb %}Movimientos{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+            <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Trazabilidad operativa</p>
+            <h1 class="text-3xl font-bold text-gray-800">Movimientos</h1>
+            <p class="text-gray-500 mt-1">Cada entrada y salida, con su historia completa.</p>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+            <a href="{% url 'almacen:movimiento_exportar' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+               class="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                <i data-lucide="download" class="w-4 h-4"></i> Exportar
+            </a>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        
+        <!-- Barra de Filtros -->
+        <div class="p-4 border-b border-gray-200 bg-white">
+            <form method="get" class="flex flex-col md:flex-row gap-3 items-center">
+                
+                <!-- Selector de tipo -->
+                <div class="w-full md:w-64">
+                    <select name="tipo" 
+                            class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none cursor-pointer">
+                        <option value="">Todos</option>
+                        <option value="entrada_compra" {% if request.GET.tipo == 'entrada_compra' %}selected{% endif %}>Entrada por compra</option>
+                        <option value="entrada_transferencia" {% if request.GET.tipo == 'entrada_transferencia' %}selected{% endif %}>Entrada por transferencia</option>
+                        <option value="entrada_devolucion" {% if request.GET.tipo == 'entrada_devolucion' %}selected{% endif %}>Entrada por devolución</option>
+                        <option value="salida_despacho" {% if request.GET.tipo == 'salida_despacho' %}selected{% endif %}>Salida por despacho</option>
+                        <option value="salida_consumo" {% if request.GET.tipo == 'salida_consumo' %}selected{% endif %}>Salida por consumo</option>
+                        <option value="ajuste_positivo" {% if request.GET.tipo == 'ajuste_positivo' %}selected{% endif %}>Ajuste positivo</option>
+                        <option value="ajuste_negativo" {% if request.GET.tipo == 'ajuste_negativo' %}selected{% endif %}>Ajuste negativo</option>
+                    </select>
+                </div>
+
+                <p class="text-sm text-gray-500 flex-shrink-0">
+                    <span class="font-bold text-gray-700">{{ total_movimientos|default:page_obj.paginator.count|default:0 }}</span> movimientos
+                </p>
+
+                <div class="flex-1"></div>
+
+                <!-- Botones de acción -->
+                <div class="flex gap-2">
+                    <button type="submit" class="p-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition" title="Filtrar">
+                        <i data-lucide="filter" class="w-5 h-5"></i>
+                    </button>
+                    <a href="{% url 'almacen:movimiento_list' %}" class="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                        Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de Movimientos -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4">Fecha</th>
+                        <th class="px-6 py-4">Área</th>
+                        <th class="px-6 py-4">Producto</th>
+                        <th class="px-6 py-4">Movimiento</th>
+                        <th class="px-6 py-4">Cantidad</th>
+                        <th class="px-6 py-4">Motivo</th>
+                        <th class="px-6 py-4">Solicitante</th>
+                        <th class="px-6 py-4">Origen</th>
+                        <th class="px-6 py-4 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for m in movimientos %}
+                    <tr class="hover:bg-gray-50 transition">
+                        
+                        <!-- Fecha -->
+                        <td class="px-6 py-4">
+                            <p class="font-medium text-gray-800">{{ m.fecha_movimiento|date:"d/m/Y" }}</p>
+                            <p class="text-xs text-gray-400">{{ m.fecha_movimiento|date:"H:i" }}</p>
+                        </td>
+
+                        <!-- Área -->
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 text-xs">{{ m.area.nombre|default:"—" }}</span>
+                        </td>
+
+                        <!-- Producto -->
+                        <td class="px-6 py-4">
+                            {% with det=m.detalles.first %}
+                                {% if det %}
+                                    <p class="font-medium text-gray-800">{{ det.producto.nombre }}</p>
+                                    <p class="text-xs text-gray-400 font-mono">{{ det.producto.sku }}</p>
+                                    {% if m.detalles.count > 1 %}
+                                        <p class="text-xs text-teal-600 mt-1">+ {{ m.detalles.count|add:"-1" }} más</p>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-gray-400">—</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <!-- Tipo de movimiento (badge) -->
+                        <td class="px-6 py-4">
+                            {% if "entrada" in m.tipo %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100">
+                                    <i data-lucide="arrow-down-left" class="w-3 h-3"></i>
+                                    {{ m.get_tipo_display }}
+                                </span>
+                            {% elif "salida" in m.tipo %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                                    <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+                                    {{ m.get_tipo_display }}
+                                </span>
+                            {% elif "positivo" in m.tipo %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    <i data-lucide="plus-circle" class="w-3 h-3"></i>
+                                    {{ m.get_tipo_display }}
+                                </span>
+                            {% elif "negativo" in m.tipo %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                    <i data-lucide="minus-circle" class="w-3 h-3"></i>
+                                    {{ m.get_tipo_display }}
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                    <i data-lucide="sliders" class="w-3 h-3"></i>
+                                    {{ m.get_tipo_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Cantidad -->
+                        <td class="px-6 py-4">
+                            {% with det=m.detalles.first %}
+                                {% if det %}
+                                    <span class="font-semibold text-gray-800">{{ det.cantidad }}</span>
+                                {% else %}
+                                    <span class="text-gray-400">—</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+
+                        <!-- Motivo -->
+                        <td class="px-6 py-4">
+                            <span class="text-gray-600 text-xs">{{ m.motivo|default:"—"|truncatechars:40 }}</span>
+                        </td>
+
+                        <!-- Solicitante -->
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700">
+                                {{ m.creado_por.get_full_name|default:m.creado_por.username|default:"—" }}
+                            </span>
+                        </td>
+
+                        <!-- Origen (número del movimiento) -->
+                        <td class="px-6 py-4">
+                            <p class="font-mono text-xs text-gray-700">{{ m.numero|default:"—" }}</p>
+                            <span class="inline-flex items-center gap-1 mt-1 text-xs
+                                {% if m.estado == 'confirmado' %}text-teal-600
+                                {% elif m.estado == 'borrador' %}text-orange-500
+                                {% else %}text-gray-400{% endif %}">
+                                <span class="w-1.5 h-1.5 rounded-full
+                                    {% if m.estado == 'confirmado' %}bg-teal-500
+                                    {% elif m.estado == 'borrador' %}bg-orange-400
+                                    {% else %}bg-gray-400{% endif %}"></span>
+                                {{ m.get_estado_display }}
+                            </span>
+                        </td>
+
+                        <!-- Acción: ver detalle -->
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'almacen:movimiento_detail' m.numero %}" 
+                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-teal-700 hover:bg-teal-50 transition" 
+                               title="Ver detalle">
+                                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                                    <i data-lucide="arrow-right-left" class="w-8 h-8 text-teal-600"></i>
+                                </div>
+                                <p class="text-lg font-medium text-gray-700 mb-1">Sin movimientos registrados</p>
+                                <p class="text-sm text-gray-400">El historial de tu almacén comienza aquí.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+            <p class="text-sm text-gray-500">
+                Página <span class="font-medium text-gray-700">{{ page_obj.number }}</span> de <span class="font-medium text-gray-700">{{ page_obj.paginator.num_pages }}</span>
+            </p>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+                       class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-white transition">Anterior</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+                       class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-white transition">Siguiente</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

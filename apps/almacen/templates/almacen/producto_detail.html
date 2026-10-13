@@ -1,0 +1,294 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}{{ producto.sku }} - {{ producto.nombre }}{% endblock %}
+{% block breadcrumb %}{{ producto.sku }}{% endblock %}
+
+{% block content %}
+<!-- Overlay oscuro (fondo del modal) -->
+<a href="{% url 'almacen:producto_list' %}" 
+   class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 block" 
+   aria-label="Cerrar modal"></a>
+
+<!-- Modal (panel flotante) -->
+<div class="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 pointer-events-none">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl relative my-4 pointer-events-auto">
+        
+        <!-- Botón de cerrar (✕) -->
+        <a href="{% url 'almacen:producto_list' %}" 
+           class="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition z-10">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </a>
+
+        <!-- Encabezado del modal -->
+        <div class="px-5 py-3 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800">{{ producto.nombre }}</h2>
+            <p class="text-xs text-gray-500 mt-0.5">
+                {{ producto.sku }}
+                {% if producto.estado_fisico %} · {{ producto.estado_fisico.nombre }}{% endif %}
+            </p>
+        </div>
+
+        <!-- Cuerpo del modal -->
+        <div class="p-5">
+
+            <!-- QR + Datos en 2 columnas (compacto) -->
+            <div class="flex flex-col md:flex-row gap-5 mb-5">
+
+                <!-- Columna Izquierda: QR compacto -->
+                <div class="flex-shrink-0 flex flex-col items-center">
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3">
+                        <div class="bg-white p-2 rounded-lg">
+                            <img src="{% url 'almacen:producto_qr' producto.codigo_qr %}" 
+                                 alt="QR de {{ producto.nombre }}" 
+                                 class="w-44 h-44 object-contain">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 font-mono mt-2">{{ producto.sku }}</p>
+                    
+                    <!-- Botones compactos debajo del QR -->
+                    <div class="flex flex-col gap-1.5 mt-3 w-full">
+                        <button type="button"
+                                id="btn-descargar-qr"
+                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-corporate-navy text-white rounded-lg text-xs font-medium hover:bg-corporate-navy2 transition">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Descargar QR
+                        </button>
+                        <button type="button"
+                                id="btn-imprimir-qr"
+                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir QR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Datos del producto -->
+                <div class="flex-1 min-w-0">
+                    
+                    <!-- Grid de datos (2 columnas compactas) -->
+                    <div class="grid grid-cols-2 gap-x-5 gap-y-2.5">
+                        
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Stock actual</p>
+                            <p class="text-sm font-bold text-gray-800">
+                                {{ producto.stock_actual }}
+                                {% if producto.unidad_medida %}<span class="font-normal text-gray-500 text-xs">{{ producto.unidad_medida.nombre }}</span>{% endif %}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Stock mínimo</p>
+                            <p class="text-sm font-bold text-gray-800">{{ producto.stock_minimo }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Precio unitario</p>
+                            <p class="text-sm font-bold text-gray-800">{{ producto.precio_unitario|floatformat:2 }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Estado físico</p>
+                            <p class="text-sm font-bold text-gray-800">{{ producto.estado_fisico.nombre|default:"—" }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Número de serie</p>
+                            <p class="text-sm font-bold text-gray-800">{{ producto.numero_serie|default:"—" }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Proveedor</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ producto.proveedor.nombre|default:"—" }}</p>
+                        </div>
+
+                        <div class="col-span-2">
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Código de almacén (UUID)</p>
+                            <p class="text-xs font-mono text-gray-700 break-all leading-tight">{{ producto.codigo_qr }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Estado</p>
+                            <p class="text-sm font-bold {% if producto.activo %}text-corporate-navy{% else %}text-gray-400{% endif %}">
+                                {% if producto.activo %}Activo{% else %}Inactivo{% endif %}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase tracking-wide mb-0.5">Área</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ producto.area.nombre|default:"—" }}</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer del modal: Botones de acción -->
+            <div class="pt-4 border-t border-gray-100 flex justify-between items-center gap-2">
+                <a href="{% url 'almacen:producto_list' %}" 
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver
+                </a>
+
+                <div class="flex gap-2">
+
+                    <!-- ✅ Botón Desactivar / Reactivar -->
+                    {% if producto.activo %}
+                    <form method="post" action="{% url 'almacen:producto_desactivar' producto.codigo_qr %}" class="inline">
+                        {% csrf_token %}
+
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'almacen:producto_activar' producto.codigo_qr %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-corporate-border rounded-lg text-xs font-medium text-corporate-navy bg-white hover:bg-corporate-light transition"
+                                title="Volver a mostrar en el catálogo activo">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reactivar
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <button type="button" 
+                            onclick="document.getElementById('modal-eliminar').classList.remove('hidden')"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-200 rounded-lg text-xs font-medium text-corporate-red bg-white hover:bg-red-50 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar
+                    </button>
+                    
+                    <a href="{% url 'almacen:producto_update' producto.codigo_qr %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-corporate-navy text-white rounded-lg text-xs font-medium hover:bg-corporate-navy2 transition">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div id="modal-eliminar" class="hidden fixed inset-0 z-[60] overflow-y-auto flex items-center justify-center p-4">
+    
+    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" 
+         onclick="document.getElementById('modal-eliminar').classList.add('hidden')"></div>
+    
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10">
+        
+        <button type="button" 
+                onclick="document.getElementById('modal-eliminar').classList.add('hidden')"
+                class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="p-6 pt-8 text-center">
+            
+            <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-8 h-8 text-corporate-red"></i>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-2">¿Eliminar producto?</h2>
+            
+            <p class="text-sm text-gray-500 mb-1">
+                Estás a punto de eliminar el siguiente producto:
+            </p>
+            <p class="text-sm font-bold text-gray-800 mb-6">
+                {{ producto.sku }} — {{ producto.nombre }}
+            </p>
+            
+            <p class="text-xs text-corporate-red mb-6 flex items-center justify-center gap-1">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                Esta acción no se puede deshacer
+            </p>
+
+            {% if producto.stock_actual > 0 %}
+            <div class="bg-blue-50 border border-blue-200 text-corporate-navy text-xs p-3 rounded-lg mb-4 text-left">
+                <p class="font-bold mb-1">📦 Ajuste automático de stock</p>
+                <p>Se registrará un <strong>ajuste negativo de {{ producto.stock_actual }} {{ producto.unidad_medida.codigo|default:"uds" }}</strong> en el historial de movimientos antes de eliminar el producto.</p>
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'almacen:producto_delete' producto.codigo_qr %}" class="flex gap-3">
+                {% csrf_token %}
+                
+                <button type="button" 
+                        onclick="document.getElementById('modal-eliminar').classList.add('hidden')"
+                        class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                
+                <button type="submit" 
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-corporate-red text-white rounded-lg text-sm font-medium hover:bg-corporate-red2 transition shadow-sm">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Sí, eliminar
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Script refactorizado -->
+<script>
+    // Variables definidas en JS
+    const QR_URL = "{% url 'almacen:producto_qr' producto.codigo_qr %}";
+    const PRODUCTO_SKU = "{{ producto.sku|escapejs }}";
+    const PRODUCTO_NOMBRE = "{{ producto.nombre|escapejs }}";
+
+    // Descargar QR
+    function descargarQR() {
+        fetch(QR_URL)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `QR-${PRODUCTO_SKU}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error al descargar QR:', error);
+                alert('No se pudo descargar el QR. Intenta de nuevo.');
+            });
+    }
+
+    // Imprimir QR
+    function imprimirQR() {
+        const ventana = window.open('', '_blank', 'width=600,height=600');
+        ventana.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR - ${PRODUCTO_SKU}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+                    h1 { font-size: 24px; margin-bottom: 8px; }
+                    p { color: #666; margin-bottom: 24px; font-size: 14px; }
+                    img { width: 300px; height: 300px; }
+                    .footer { margin-top: 24px; font-size: 12px; color: #999; font-family: monospace; }
+                </style>
+            </head>
+            <body>
+                <h1>${PRODUCTO_SKU}</h1>
+                <p>${PRODUCTO_NOMBRE}</p>
+                <img src="${QR_URL}" alt="QR">
+                <div class="footer">Almacén - ${new Date().toLocaleDateString()}</div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        ventana.document.close();
+    }
+
+    // Conectar botones con los listeners
+    document.getElementById('btn-descargar-qr').addEventListener('click', descargarQR);
+    document.getElementById('btn-imprimir-qr').addEventListener('click', imprimirQR);
+</script>
+{% endblock %}

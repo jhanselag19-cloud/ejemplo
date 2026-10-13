@@ -1,0 +1,423 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Proyectos & Desarrollos TOMTOM - Almacén{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ✅ Configuración de Tailwind — INLINE, después del CDN, antes del DOM -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        corporate: {
+                            navy:   '#1B2A4A',
+                            navy2:  '#24365C',
+                            navy3:  '#2E4370',
+                            red:    '#E30613',
+                            red2:   '#B90510',
+                            light:  '#F4F5F7',
+                            border: '#E5E7EB',
+                        },
+                        // ✅ Sobrescribimos "teal" con los azules del logo
+                        teal: {
+                            50:  '#E8EBF2',
+                            100: '#D1D7E3',
+                            200: '#A6B0C6',
+                            300: '#7A8AA9',
+                            400: '#4F638C',
+                            500: '#2E4370',
+                            600: '#24365C',
+                            700: '#1B2A4A',
+                            800: '#151F37',
+                            900: '#0E1626',
+                        },
+                        // ✅ Rojo afinado al corporativo
+                        red: {
+                            50:  '#FDEAEC',
+                            100: '#FBD5D8',
+                            200: '#F5AAB1',
+                            300: '#EE7F89',
+                            400: '#E75462',
+                            500: '#E30613',
+                            600: '#B90510',
+                            700: '#8C040C',
+                            800: '#5F0308',
+                            900: '#320104',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #F4F5F7; }
+
+        .sidebar-active {
+            background-color: #E8EBF2;
+            color: #1B2A4A;
+            font-weight: 600;
+            border-right: 3px solid #1B2A4A;
+        }
+        .sidebar-item { color: #4b5563; transition: all 0.2s; }
+        .sidebar-item:hover { background-color: #F4F5F7; color: #1B2A4A; }
+    </style>
+
+    <!-- ✅ Estilos de impresión -->
+    <style>
+        @media print {
+            aside, header, nav, .no-print, button, script { display: none !important; }
+            body {
+                background: white !important;
+                display: block !important;
+                overflow: visible !important;
+                height: auto !important;
+                font-size: 12px;
+            }
+            main {
+                overflow: visible !important;
+                display: block !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+            .flex-1.overflow-y-auto {
+                overflow: visible !important;
+                padding: 0 !important;
+                height: auto !important;
+            }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            .shadow-sm, .shadow { box-shadow: none !important; }
+            table { font-size: 10pt; width: 100% !important; }
+            input.conteo-fisico {
+                border: none !important;
+                background: transparent !important;
+                width: auto !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- BARRA LATERAL (Sidebar) -->
+    <aside class="no-print w-64 bg-white border-r border-corporate-border flex flex-col justify-between hidden md:flex">
+        <div>
+            <!-- ✅ Logo corporativo -->
+            <div class="px-4 py-3 border-b border-corporate-border flex flex-col items-center">
+                <img src="{% static 'almacen/img/logo1.png' %}" 
+                     alt="Proyectos & Desarrollos TOMTOM" 
+                     class="w-32 h-auto object-contain">
+            </div>
+
+            <!-- Selector de Almacén -->
+            <div class="px-3 my-3">
+                <div class="border border-corporate-border rounded-lg px-3 py-2 flex items-center justify-between text-xs bg-corporate-light">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-corporate-red"></span>
+                        <span class="font-medium text-gray-700">Almacén principal</span>
+                    </div>
+                    <span class="text-gray-400">01</span>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="flex flex-col">
+                <p class="px-5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Espacio de trabajo</p>
+                
+                <a href="{% url 'almacen:home' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if request.resolver_match.url_name == 'home' %}sidebar-active{% endif %}">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Vista general
+                </a>
+                <a href="{% url 'almacen:producto_list' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'producto' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                    <i data-lucide="package" class="w-4 h-4"></i> Productos
+                </a>
+                <a href="{% url 'almacen:movimiento_list' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'movimiento' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                     <i data-lucide="arrow-right-left" class="w-4 h-4"></i> Movimientos
+                </a>
+                <a href="{% url 'almacen:transferencia_list' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'transferencia' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i> Transferencias
+                </a>
+                <a href="{% url 'almacen:escanear' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if request.resolver_match.url_name == 'escanear' %}sidebar-active{% endif %}">
+                    <i data-lucide="scan-line" class="w-4 h-4"></i> Escanear QR
+                </a>
+                <a href="{% url 'almacen:area_list' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'area' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                    <i data-lucide="layers" class="w-4 h-4"></i> Áreas de almacenaje
+                </a>
+                <a href="{% url 'almacen:reportes' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'reportes' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Reportes
+                </a>
+                <a href="{% url 'almacen:solicitud_compra_list' %}" class="sidebar-item flex items-center gap-3 px-5 py-2 text-sm {% if 'solicitud_compra' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Solicitudes de compra
+                </a>
+            </nav>
+        </div>
+
+        <!-- Footer del Sidebar -->
+        <div class="p-3 border-t border-corporate-border">
+            <div class="flex items-center gap-2 text-xs text-gray-600">
+                <div class="w-7 h-7 rounded-full bg-corporate-navy text-white flex items-center justify-center font-bold text-[10px]">
+                    {% if user.is_authenticated %}
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        {% if not user.first_name and not user.last_name %}
+                            {{ user.username|slice:":2"|upper }}
+                        {% endif %}
+                    {% else %}
+                        TT
+                    {% endif %}
+                </div>
+                <div class="min-w-0">
+                    <p class="font-medium text-gray-800 truncate text-xs">
+                        {% if user.is_authenticated %}
+                            {{ user.get_full_name|default:user.username }}
+                        {% else %}
+                            Espacio de muestra
+                        {% endif %}
+                    </p>
+                    <p class="text-[10px] text-gray-500 truncate">
+                        {% if user.is_authenticated %}
+                            {{ user.email|default:"Sesión activa" }}
+                        {% else %}
+                            Demostración interactiva
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- Barra Superior (Topbar) -->
+        <header class="no-print bg-white border-b border-corporate-border h-16 flex items-center justify-between px-8">
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i data-lucide="chevron-left" class="w-4 h-4 cursor-pointer hover:text-corporate-navy"></i>
+                <span>Almacén</span>
+                <span>/</span>
+                <span class="text-corporate-navy font-semibold">{% block breadcrumb %}Vista general{% endblock %}</span>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <!-- Notificaciones -->
+                <div class="relative">
+                    <button type="button" 
+                            id="btn-notificaciones"
+                            class="relative w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 hover:text-corporate-navy hover:bg-corporate-light transition">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        {% if notificaciones_no_leidas > 0 %}
+                        <span class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-corporate-red text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                            {{ notificaciones_no_leidas }}
+                        </span>
+                        {% endif %}
+                    </button>
+
+                    <div id="panel-notificaciones" 
+                         class="hidden absolute right-0 top-12 w-96 max-w-[90vw] bg-white rounded-xl shadow-xl border border-corporate-border z-50 overflow-hidden">
+                        
+                        <div class="px-4 py-3 border-b border-corporate-border flex justify-between items-center">
+                            <h3 class="font-bold text-corporate-navy text-sm">Notificaciones</h3>
+                            {% if notificaciones_no_leidas > 0 %}
+                            <a href="{% url 'almacen:notificaciones_marcar_leidas' %}" 
+                               class="text-xs text-corporate-red hover:underline font-medium">
+                                Marcar todas como leídas
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="max-h-96 overflow-y-auto">
+                            {% for notif in notificaciones_ultimas %}
+                            <a href="{% url 'almacen:notificacion_marcar_leida' notif.pk %}" 
+                               class="block px-4 py-3 hover:bg-corporate-light transition border-b border-gray-50 {% if not notif.leida %}bg-blue-50/30{% endif %}">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                                        {% if notif.tipo == 'solicitud_compra' %}bg-blue-100 text-blue-600
+                                        {% elif notif.tipo == 'stock_bajo' %}bg-red-100 text-corporate-red
+                                        {% elif notif.tipo == 'transferencia' %}bg-corporate-navy/10 text-corporate-navy
+                                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                        {% if notif.tipo == 'solicitud_compra' %}
+                                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                                        {% elif notif.tipo == 'stock_bajo' %}
+                                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                        {% elif notif.tipo == 'transferencia' %}
+                                            <i data-lucide="shuffle" class="w-4 h-4"></i>
+                                        {% else %}
+                                            <i data-lucide="info" class="w-4 h-4"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-gray-800 {% if not notif.leida %}font-bold{% endif %}">
+                                            {{ notif.titulo }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notif.mensaje|truncatechars:100 }}</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">{{ notif.creado_en|timesince }} atrás</p>
+                                    </div>
+                                    {% if not notif.leida %}
+                                    <span class="w-2 h-2 rounded-full bg-corporate-red flex-shrink-0 mt-2"></span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% empty %}
+                            <div class="text-center py-12 text-gray-400">
+                                <i data-lucide="bell-off" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
+                                <p class="text-sm">No tienes notificaciones</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menú de usuario -->
+                <div class="relative">
+                    <button type="button"
+                            id="btn-usuario"
+                            class="flex items-center gap-2 rounded-lg pl-1 pr-2 py-1 hover:bg-corporate-light transition">
+                        <div class="w-8 h-8 rounded-full bg-corporate-navy text-white flex items-center justify-center font-bold text-xs">
+                            {% if user.is_authenticated %}
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                {% if not user.first_name and not user.last_name %}
+                                    {{ user.username|slice:":2"|upper }}
+                                {% endif %}
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+                    </button>
+
+                    <div id="panel-usuario"
+                         class="hidden absolute right-0 top-12 w-64 bg-white rounded-xl shadow-xl border border-corporate-border z-50 overflow-hidden">
+
+                        {% if user.is_authenticated %}
+                            <div class="px-4 py-4 border-b border-corporate-border">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-corporate-navy text-white flex items-center justify-center font-bold text-sm">
+                                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                        {% if not user.first_name and not user.last_name %}
+                                            {{ user.username|slice:":2"|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-800 truncate">
+                                            {{ user.get_full_name|default:user.username }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 truncate">{{ user.email|default:"Sin correo" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="py-1">
+                                {% if user.is_staff %}
+                                <a href="{% url 'admin:index' %}" target="_blank"
+                                   class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-corporate-light transition">
+                                    <i data-lucide="shield" class="w-4 h-4 text-gray-400"></i>
+                                    Panel de administración
+                                </a>
+                                {% endif %}
+
+                                <a href="{% url 'almacen:password_change' %}"
+                                   class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-corporate-light transition">
+                                    <i data-lucide="key-round" class="w-4 h-4 text-gray-400"></i>
+                                    Cambiar contraseña
+                                </a>
+                            </div>
+
+                            <div class="border-t border-corporate-border py-1">
+                                <form method="post" action="{% url 'almacen:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-corporate-red hover:bg-red-50 transition text-left">
+                                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                                        Cerrar sesión
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="p-4">
+                                <p class="text-sm text-gray-600 mb-3">No has iniciado sesión.</p>
+                                <a href="{% url 'almacen:login' %}"
+                                   class="block text-center px-4 py-2 bg-corporate-navy text-white rounded-lg text-sm font-medium hover:bg-corporate-navy2 transition">
+                                    Iniciar sesión
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido Dinámico -->
+        <div class="flex-1 overflow-y-auto p-8">
+            {% if messages %}
+                <div class="mb-4">
+                    {% for m in messages %}
+                        <div class="bg-blue-50 text-corporate-navy p-3 rounded-lg border border-blue-200 text-sm mb-2">{{ m }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Librerías -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnNotif = document.getElementById('btn-notificaciones');
+            const panelNotif = document.getElementById('panel-notificaciones');
+            const btnUsuario = document.getElementById('btn-usuario');
+            const panelUsuario = document.getElementById('panel-usuario');
+
+            function cerrarTodos() {
+                panelNotif?.classList.add('hidden');
+                panelUsuario?.classList.add('hidden');
+            }
+
+            if (btnNotif && panelNotif) {
+                btnNotif.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const estabaOculto = panelNotif.classList.contains('hidden');
+                    cerrarTodos();
+                    if (estabaOculto) panelNotif.classList.remove('hidden');
+                });
+            }
+
+            if (btnUsuario && panelUsuario) {
+                btnUsuario.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const estabaOculto = panelUsuario.classList.contains('hidden');
+                    cerrarTodos();
+                    if (estabaOculto) panelUsuario.classList.remove('hidden');
+                });
+            }
+
+            document.addEventListener('click', function (e) {
+                if (panelNotif && !panelNotif.contains(e.target) && !btnNotif?.contains(e.target)) {
+                    panelNotif.classList.add('hidden');
+                }
+                if (panelUsuario && !panelUsuario.contains(e.target) && !btnUsuario?.contains(e.target)) {
+                    panelUsuario.classList.add('hidden');
+                }
+            });
+
+            panelNotif?.addEventListener('click', e => e.stopPropagation());
+            panelUsuario?.addEventListener('click', e => e.stopPropagation());
+        });
+    </script>
+</body>
+</html>

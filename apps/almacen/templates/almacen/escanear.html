@@ -1,0 +1,224 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}Escanear QR - Almacén{% endblock %}
+{% block breadcrumb %}Escanear QR{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    
+    <!-- Encabezado -->
+    <div class="mb-8">
+        <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Identificación inteligente</p>
+        <h1 class="text-3xl font-bold text-gray-800">Escanear QR</h1>
+        <p class="text-gray-500 mt-1">Encuentra el producto. Consulta su historia.</p>
+    </div>
+
+    <!-- Mensajes de error/éxito -->
+    {% if messages %}
+        {% for m in messages %}
+            <div class="mb-4 p-3 rounded-lg border text-sm
+                {% if m.tags == 'error' %}bg-red-50 text-red-700 border-red-200
+                {% else %}bg-teal-50 text-teal-700 border-teal-200{% endif %}">
+                {{ m }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Contenedor principal con 2 columnas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+
+        <!-- COLUMNA IZQUIERDA: Cámara -->
+        <div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6">
+            
+            <!-- Contenedor del lector de QR -->
+            <div id="reader-container" class="hidden mb-4 rounded-xl overflow-hidden bg-black">
+                <div id="reader" class="w-full"></div>
+            </div>
+
+            <!-- Estado inicial (antes de activar cámara) -->
+            <div id="placeholder-camara" class="flex flex-col items-center justify-center min-h-[400px]">
+                
+                <!-- Ícono de escáner -->
+                <div class="w-32 h-32 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mb-6">
+                    <i data-lucide="scan-line" class="w-16 h-16 text-teal-600"></i>
+                </div>
+
+                <p class="text-sm text-gray-500 text-center mb-6 max-w-xs">
+                    Coloca el código QR frente a la cámara para identificarlo automáticamente.
+                </p>
+
+                <!-- Botón activar cámara -->
+                <button type="button" 
+                        id="btn-activar-camara"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                    <i data-lucide="camera" class="w-4 h-4"></i> Activar cámara
+                </button>
+
+                <p class="text-xs text-gray-400 mt-4 italic text-center max-w-xs">
+                    Se te pedirá permiso para acceder a la cámara del dispositivo.
+                </p>
+            </div>
+
+            <!-- Estado de escaneo activo -->
+            <div id="estado-escaneo" class="hidden mt-4 text-center">
+                <p class="text-xs text-teal-600 font-medium mb-3">
+                    <span class="inline-block w-2 h-2 rounded-full bg-teal-500 animate-pulse mr-1"></span>
+                    Escaneando...
+                </p>
+                <button type="button" 
+                        id="btn-detener-camara"
+                        class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                    <i data-lucide="square" class="w-4 h-4"></i> Detener cámara
+                </button>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: Búsqueda manual -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-8">
+            
+            <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-2">Consulta manual</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Buscar por código</h2>
+
+            <!-- Formulario de búsqueda -->
+            <form method="get" class="space-y-4" id="form-buscar">
+                
+                <div>
+                    <label for="codigo" class="block text-xs font-medium text-gray-600 mb-2">
+                        SKU, UUID o código de barras
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3.5 text-gray-400"></i>
+                        <input type="text" 
+                               name="codigo" 
+                               id="codigo" 
+                               value="{{ request.GET.codigo|default:'' }}"
+                               placeholder="Ej. SOL-001" 
+                               autofocus
+                               autocomplete="off"
+                               class="w-full pl-9 pr-4 py-3 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition shadow-sm">
+                    <i data-lucide="search" class="w-4 h-4"></i> Buscar producto
+                </button>
+
+            </form>
+
+            <!-- Ayuda / Tipos de búsqueda -->
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Puedes buscar por</p>
+                <div class="space-y-2">
+                    <div class="flex items-start gap-2 text-xs text-gray-600">
+                        <i data-lucide="hash" class="w-3.5 h-3.5 text-teal-600 mt-0.5 flex-shrink-0"></i>
+                        <span><strong>SKU</strong> — Código interno (ej. <span class="font-mono">SOL-001</span>)</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-xs text-gray-600">
+                        <i data-lucide="qr-code" class="w-3.5 h-3.5 text-teal-600 mt-0.5 flex-shrink-0"></i>
+                        <span><strong>UUID</strong> — Código QR completo</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-xs text-gray-600">
+                        <i data-lucide="barcode" class="w-3.5 h-3.5 text-teal-600 mt-0.5 flex-shrink-0"></i>
+                        <span><strong>Código de barras</strong> — EAN, UPC, etc.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Librería de escaneo QR: html5-qrcode -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+    let html5QrCode = null;
+    let camaraActiva = false;
+
+    const btnActivar = document.getElementById('btn-activar-camara');
+    const btnDetener = document.getElementById('btn-detener-camara');
+    const placeholderCamara = document.getElementById('placeholder-camara');
+    const readerContainer = document.getElementById('reader-container');
+    const estadoEscaneo = document.getElementById('estado-escaneo');
+
+    // Al hacer clic en "Activar cámara"
+    btnActivar.addEventListener('click', function () {
+        if (camaraActiva) return;
+
+        html5QrCode = new Html5Qrcode("reader");
+
+        // Mostrar el contenedor del video, ocultar el placeholder
+        readerContainer.classList.remove('hidden');
+        placeholderCamara.classList.add('hidden');
+
+        // Iniciar la cámara trasera (environment)
+        html5QrCode.start(
+            { facingMode: "environment" },   // cámara trasera
+            {
+                fps: 10,                      // 10 frames por segundo
+                qrbox: { width: 250, height: 250 }  // cuadro de escaneo
+            },
+            onScanSuccess,                    // callback de éxito
+            onScanError                       // callback de error (silencioso)
+        ).then(() => {
+            camaraActiva = true;
+            estadoEscaneo.classList.remove('hidden');
+            lucide.createIcons();
+        }).catch((err) => {
+            console.error("Error al iniciar la cámara:", err);
+            alert("No se pudo acceder a la cámara.\n\nVerifica:\n- Que el navegador tenga permiso.\n- Que el sitio sea HTTPS o localhost.\n- Que exista una cámara disponible.");
+            // Revertir a placeholder
+            readerContainer.classList.add('hidden');
+            placeholderCamara.classList.remove('hidden');
+        });
+    });
+
+    // Al hacer clic en "Detener cámara"
+    btnDetener.addEventListener('click', function () {
+        detenerCamara();
+    });
+
+    // Función para detener la cámara
+    function detenerCamara() {
+        if (html5QrCode && camaraActiva) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                camaraActiva = false;
+                readerContainer.classList.add('hidden');
+                placeholderCamara.classList.remove('hidden');
+                estadoEscaneo.classList.add('hidden');
+                lucide.createIcons();
+            }).catch((err) => {
+                console.error("Error al detener la cámara:", err);
+            });
+        }
+    }
+
+    // Cuando se detecta un QR exitosamente
+    function onScanSuccess(decodedText, decodedResult) {
+        console.log("✅ QR detectado:", decodedText);
+
+        // Detener la cámara inmediatamente para no procesar más lecturas
+        detenerCamara();
+
+        // Redirigir a la URL de búsqueda con el código detectado
+        const url = new URL(window.location.href);
+        url.searchParams.set('codigo', decodedText);
+        window.location.href = url.toString();
+    }
+
+    // Errores de escaneo (silenciosos, pasan cada frame sin QR)
+    function onScanError(errorMessage) {
+        // No hacemos nada, es normal mientras busca
+    }
+
+    // Detener cámara al salir de la página (evita que la cámara siga activa)
+    window.addEventListener('beforeunload', function () {
+        if (camaraActiva) {
+            detenerCamara();
+        }
+    });
+</script>
+{% endblock %}

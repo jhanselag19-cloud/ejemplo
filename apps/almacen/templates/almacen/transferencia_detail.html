@@ -1,0 +1,158 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}{{ transferencia.numero }} - Almacén{% endblock %}
+{% block breadcrumb %}{{ transferencia.numero }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto pb-12">
+    
+    <!-- Encabezado -->
+    <div class="mb-8">
+        <a href="{% url 'almacen:transferencia_list' %}" 
+           class="inline-flex items-center gap-1 text-xs font-bold text-teal-600 uppercase tracking-wider hover:text-teal-800 transition mb-3">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i> Volver a transferencias
+        </a>
+        <div class="flex items-center gap-4 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800">{{ transferencia.numero }}</h1>
+            {% if transferencia.estado == 'borrador' %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Borrador
+                </span>
+            {% elif transferencia.estado == 'confirmada' %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Confirmada
+                </span>
+            {% elif transferencia.estado == 'anulada' %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Anulada
+                </span>
+            {% endif %}
+        </div>
+        <p class="text-gray-500">
+            Creada el {{ transferencia.fecha_transferencia|date:"d/m/Y" }} a las {{ transferencia.fecha_transferencia|date:"H:i" }}
+        </p>
+    </div>
+
+    <!-- Acciones -->
+    {% if transferencia.estado == 'borrador' %}
+    <div class="bg-white border border-gray-200 rounded-xl p-5 mb-6">
+        <p class="text-sm font-bold text-gray-800 mb-3">Acciones disponibles</p>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'almacen:transferencia_confirmar' transferencia.numero %}" 
+               onclick="return confirm('¿Confirmar esta transferencia? Los productos se moverán al área de destino.')"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                <i data-lucide="check" class="w-4 h-4"></i> Confirmar transferencia
+            </a>
+            <a href="{% url 'almacen:transferencia_anular' transferencia.numero %}" 
+               onclick="return confirm('¿Anular esta transferencia?')"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100 transition">
+                <i data-lucide="x" class="w-4 h-4"></i> Anular
+            </a>
+        </div>
+    </div>
+    {% elif transferencia.estado == 'confirmada' and transferencia.movimiento_generado %}
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+        <div class="flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+                <p class="text-sm font-bold text-blue-800 mb-1">Transferencia completada</p>
+                <p class="text-xs text-blue-700 mb-2">Se generó el movimiento:</p>
+                <a href="{% url 'almacen:movimiento_detail' transferencia.movimiento_generado.numero %}" 
+                   class="inline-flex items-center gap-2 text-blue-700 font-mono text-sm hover:underline">
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i> {{ transferencia.movimiento_generado.numero }}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Datos generales -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4">Datos de la transferencia</h2>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Área origen</p>
+                <p class="text-sm font-bold text-gray-800">{{ transferencia.area_origen.nombre }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Área destino</p>
+                <p class="text-sm font-bold text-teal-700">{{ transferencia.area_destino.nombre }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Creada por</p>
+                <p class="text-sm font-bold text-gray-800">{{ transferencia.creado_por.get_full_name|default:transferencia.creado_por.username }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Motivo</p>
+                <p class="text-sm font-bold text-gray-800">{{ transferencia.motivo }}</p>
+            </div>
+            {% if transferencia.confirmado_por %}
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Confirmada por</p>
+                <p class="text-sm font-bold text-gray-800">{{ transferencia.confirmado_por.get_full_name|default:transferencia.confirmado_por.username }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">Fecha de confirmación</p>
+                <p class="text-sm font-bold text-gray-800">
+                    {{ transferencia.fecha_confirmacion|date:"d/m/Y" }} a las {{ transferencia.fecha_confirmacion|date:"H:i" }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if transferencia.observacion %}
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <p class="text-xs text-gray-500 mb-1">Observaciones</p>
+            <p class="text-sm text-gray-800 whitespace-pre-line">{{ transferencia.observacion }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Productos -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4">Productos transferidos</h2>
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+                <tr>
+                    <th class="px-4 py-3 text-left">Producto</th>
+                    <th class="px-4 py-3 text-left">SKU</th>
+                    <th class="px-4 py-3 text-left">Observación</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for det in transferencia.detalles.all %}
+                <tr>
+                    <td class="px-4 py-3">
+                        <p class="font-medium text-gray-800">{{ det.producto.nombre }}</p>
+                    </td>
+                    <td class="px-4 py-3">
+                        <p class="text-xs text-gray-400 font-mono">{{ det.producto.sku }}</p>
+                    </td>
+                    <td class="px-4 py-3">
+                        <p class="text-xs text-gray-500">{{ det.observacion|default:"—" }}</p>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="px-4 py-6 text-center text-gray-400 text-sm">Sin productos.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+        {% if transferencia.estado == 'borrador' %}
+        <div class="flex gap-2">
+            <a href="{% url 'almacen:transferencia_delete' transferencia.numero %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar
+            </a>
+            <a href="{% url 'almacen:transferencia_update' transferencia.numero %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                <i data-lucide="pencil" class="w-4 h-4"></i> Editar
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

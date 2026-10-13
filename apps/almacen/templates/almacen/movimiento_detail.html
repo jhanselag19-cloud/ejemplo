@@ -1,0 +1,193 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}{{ movimiento.numero }} - Almacén{% endblock %}
+{% block breadcrumb %}{{ movimiento.numero }}{% endblock %}
+
+{% block content %}
+<!-- Overlay oscuro (fondo del modal) -->
+<a href="{% url 'almacen:movimiento_list' %}" 
+   class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 block" 
+   aria-label="Cerrar modal"></a>
+
+<!-- Modal (panel flotante) -->
+<div class="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 md:p-8 pointer-events-none">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl relative my-8 pointer-events-auto">
+        
+        <!-- Botón cerrar (✕) -->
+        <a href="{% url 'almacen:movimiento_list' %}" 
+           class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition z-10">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </a>
+
+        <!-- Encabezado -->
+        <div class="p-6 pb-4 border-b border-gray-100">
+            <div class="flex items-center gap-3 mb-2">
+                <p class="font-mono text-xs text-gray-500">{{ movimiento.numero }}</p>
+                <span class="inline-flex items-center gap-1 text-xs
+                    {% if movimiento.estado == 'confirmado' %}text-teal-600
+                    {% elif movimiento.estado == 'borrador' %}text-orange-500
+                    {% else %}text-gray-400{% endif %}">
+                    <span class="w-1.5 h-1.5 rounded-full
+                        {% if movimiento.estado == 'confirmado' %}bg-teal-500
+                        {% elif movimiento.estado == 'borrador' %}bg-orange-400
+                        {% else %}bg-gray-400{% endif %}"></span>
+                    {{ movimiento.get_estado_display }}
+                </span>
+            </div>
+
+            <!-- Tipo de movimiento (badge grande) -->
+            <div class="flex items-center gap-3 mb-2">
+                {% if "entrada" in movimiento.tipo %}
+                    <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0">
+                        <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                    </div>
+                {% elif "salida" in movimiento.tipo %}
+                    <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 flex-shrink-0">
+                        <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                    </div>
+                {% else %}
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 flex-shrink-0">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                    </div>
+                {% endif %}
+                <h2 class="text-xl font-bold text-gray-800">{{ movimiento.get_tipo_display }}</h2>
+            </div>
+
+            <p class="text-sm text-gray-500">{{ movimiento.fecha_movimiento|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <!-- Cuerpo -->
+        <div class="p-6">
+
+            <!-- Grid de datos generales -->
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 mb-6">
+                
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Área</p>
+                    <p class="text-sm font-bold text-gray-800">{{ movimiento.area.nombre|default:"—" }}</p>
+                </div>
+
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Solicitante</p>
+                    <p class="text-sm font-bold text-gray-800">
+                        {{ movimiento.creado_por.get_full_name|default:movimiento.creado_por.username|default:"—" }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Proveedor</p>
+                    <p class="text-sm font-bold text-gray-800">{{ movimiento.proveedor.nombre|default:"—" }}</p>
+                </div>
+
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Confirmado por</p>
+                    <p class="text-sm font-bold text-gray-800">
+                        {% if movimiento.confirmado_por %}
+                            {{ movimiento.confirmado_por.get_full_name|default:movimiento.confirmado_por.username }}
+                        {% else %}—{% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Departamento</p>
+                    <p class="text-sm font-bold text-gray-800">{{ movimiento.departamento.nombre|default:"—" }}</p>
+                </div>
+
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Centro de costo</p>
+                    <p class="text-sm font-bold text-gray-800">{{ movimiento.centro_costo.nombre|default:"—" }}</p>
+                </div>
+
+            </div>
+
+            <!-- Motivo y Observación -->
+            {% if movimiento.motivo or movimiento.observacion %}
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
+                {% if movimiento.motivo %}
+                <div class="{% if movimiento.observacion %}mb-3{% endif %}">
+                    <p class="text-xs text-gray-500 mb-1">Motivo</p>
+                    <p class="text-sm text-gray-800">{{ movimiento.motivo }}</p>
+                </div>
+                {% endif %}
+                {% if movimiento.observacion %}
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Observaciones</p>
+                    <p class="text-sm text-gray-800">{{ movimiento.observacion }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Tabla de productos afectados -->
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-800 mb-3">Productos afectados</h3>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Producto</th>
+                                <th class="px-4 py-3 text-right">Cantidad</th>
+                                <th class="px-4 py-3 text-right">Precio Unit.</th>
+                                <th class="px-4 py-3 text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for det in movimiento.detalles.all %}
+                            <tr>
+                                <td class="px-4 py-3">
+                                    <p class="font-medium text-gray-800">{{ det.producto.nombre }}</p>
+                                    <p class="text-xs text-gray-400 font-mono">{{ det.producto.sku }}</p>
+                                </td>
+                                <td class="px-4 py-3 text-right font-semibold text-gray-800">{{ det.cantidad }}</td>
+                                <td class="px-4 py-3 text-right text-gray-600">{{ det.precio_unitario|floatformat:2 }}</td>
+                                <td class="px-4 py-3 text-right font-semibold text-gray-800">{{ det.subtotal|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-4 py-6 text-center text-gray-400 text-sm">
+                                    Sin productos asociados a este movimiento.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resumen / Totales -->
+            {% if movimiento.detalles.all %}
+            <div class="bg-teal-50 border border-teal-100 rounded-xl p-4 mb-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-teal-700 font-bold uppercase tracking-wider mb-1">Total del movimiento</p>
+                        <p class="text-xs text-teal-600">
+                            {{ movimiento.detalles.count }} producto{{ movimiento.detalles.count|pluralize }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-teal-600 mb-1">Valor total</p>
+                        <p class="text-2xl font-bold text-teal-800">
+                            {{ movimiento.detalles.count }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="pt-5 border-t border-gray-100 flex justify-between items-center gap-3">
+                <a href="{% url 'almacen:movimiento_list' %}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
+                </a>
+
+                <p class="text-xs text-gray-400 italic">
+                    Los movimientos no se pueden modificar ni eliminar (trazabilidad).
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}{{ form.instance.pk|yesno:"Editar solicitud,Nueva solicitud" }} - Almacén{% endblock %}
+{% block breadcrumb %}{{ form.instance.pk|yesno:"Editar solicitud,Nueva solicitud" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto pb-12">
+    
+    <!-- Encabezado -->
+    <div class="mb-8">
+        <a href="{% url 'almacen:solicitud_compra_list' %}" class="inline-flex items-center gap-1 text-xs font-bold text-teal-600 uppercase tracking-wider hover:text-teal-800 transition mb-3">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i> Volver a solicitudes
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800">
+            {% if form.instance.pk %}Editar solicitud{% else %}Nueva solicitud de compra{% endif %}
+        </h1>
+        <p class="text-gray-500 mt-1">Completa los datos de la solicitud y agrega los productos requeridos.</p>
+    </div>
+
+    <!-- Errores generales -->
+    {% if form.errors or detalles_formset.errors %}
+    <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6">
+        <p class="font-bold mb-2">⚠️ Hay errores en el formulario:</p>
+        <ul class="list-disc list-inside space-y-1">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li><strong>{{ field }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in detalles_formset.non_form_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate id="solicitud-form">
+        {% csrf_token %}
+
+        <!-- SECCIÓN 01 — DATOS GENERALES -->
+        <section class="mb-10">
+            <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-6">01 · Datos generales</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Área solicitante -->
+                <div>
+                    <label for="{{ form.area_solicitante.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Área solicitante <span class="text-red-500">*</span>
+                    </label>
+                    <select name="{{ form.area_solicitante.name }}" id="{{ form.area_solicitante.id_for_label }}"
+                            class="w-full px-3 py-2.5 bg-white border {% if form.area_solicitante.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none cursor-pointer">
+                        <option value="">Seleccionar área</option>
+                        {% for obj in form.area_solicitante.field.queryset %}
+                            <option value="{{ obj.pk }}" {% if form.area_solicitante.value|stringformat:"s" == obj.pk|stringformat:"s" %}selected{% endif %}>{{ obj }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.area_solicitante.errors %}<p class="text-xs text-red-600 mt-1">{{ form.area_solicitante.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Departamento -->
+                <div>
+                    <label for="{{ form.departamento.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Departamento
+                    </label>
+                    <select name="{{ form.departamento.name }}" id="{{ form.departamento.id_for_label }}"
+                            class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none cursor-pointer">
+                        <option value="">Sin departamento</option>
+                        {% for obj in form.departamento.field.queryset %}
+                            <option value="{{ obj.pk }}" {% if form.departamento.value|stringformat:"s" == obj.pk|stringformat:"s" %}selected{% endif %}>{{ obj }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Centro de costo -->
+                <div>
+                    <label for="{{ form.centro_costo.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Centro de costo
+                    </label>
+                    <select name="{{ form.centro_costo.name }}" id="{{ form.centro_costo.id_for_label }}"
+                            class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none cursor-pointer">
+                        <option value="">Sin centro de costo</option>
+                        {% for obj in form.centro_costo.field.queryset %}
+                            <option value="{{ obj.pk }}" {% if form.centro_costo.value|stringformat:"s" == obj.pk|stringformat:"s" %}selected{% endif %}>{{ obj }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Proveedor -->
+                <div>
+                    <label for="{{ form.proveedor.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Proveedor sugerido
+                    </label>
+                    <select name="{{ form.proveedor.name }}" id="{{ form.proveedor.id_for_label }}"
+                            class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none cursor-pointer">
+                        <option value="">Sin proveedor</option>
+                        {% for obj in form.proveedor.field.queryset %}
+                            <option value="{{ obj.pk }}" {% if form.proveedor.value|stringformat:"s" == obj.pk|stringformat:"s" %}selected{% endif %}>{{ obj }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Fecha requerida -->
+                <div>
+                    <label for="{{ form.fecha_necesaria.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Fecha requerida
+                    </label>
+                    <input type="date" name="{{ form.fecha_necesaria.name }}" id="{{ form.fecha_necesaria.id_for_label }}"
+                           value="{{ form.fecha_necesaria.value|default:'' }}"
+                           class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+
+                <!-- Motivo -->
+                <div>
+                    <label for="{{ form.motivo.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Motivo <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="{{ form.motivo.name }}" id="{{ form.motivo.id_for_label }}"
+                           value="{{ form.motivo.value|default:'' }}"
+                           placeholder="Ej: Reposición de insumos mensuales"
+                           class="w-full px-3 py-2.5 bg-white border {% if form.motivo.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    {% if form.motivo.errors %}<p class="text-xs text-red-600 mt-1">{{ form.motivo.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Observación (ancho completo) -->
+                <div class="md:col-span-2">
+                    <label for="{{ form.observacion.id_for_label }}" class="block text-xs font-medium text-gray-600 mb-2">
+                        Observaciones
+                    </label>
+                    <textarea name="{{ form.observacion.name }}" id="{{ form.observacion.id_for_label }}" rows="3"
+                              class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">{{ form.observacion.value|default:'' }}</textarea>
+                </div>
+
+            </div>
+        </section>
+
+        <hr class="border-gray-200 my-8">
+
+        <!-- SECCIÓN 02 — PRODUCTOS SOLICITADOS -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider">02 · Productos solicitados</h2>
+                <button type="button" onclick="agregarFila()" 
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-teal-700 border border-teal-200 rounded-lg hover:bg-teal-50 transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Agregar producto
+                </button>
+            </div>
+
+            {{ detalles_formset.management_form }}
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                        <tr>
+                            <th class="px-4 py-3 text-left w-2/5">Producto</th>
+                            <th class="px-4 py-3 text-right w-1/6">Cantidad</th>
+                            <th class="px-4 py-3 text-right w-1/6">Precio est.</th>
+                            <th class="px-4 py-3 text-left w-1/5">Observación</th>
+                            <th class="px-4 py-3 text-center w-16"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalles-tbody" class="divide-y divide-gray-200 bg-white">
+                        {% for detalle_form in detalles_formset %}
+                        <tr class="detalle-row">
+                            {{ detalle_form.id }}
+                            <td class="px-4 py-3">
+                                {{ detalle_form.producto }}
+                                {% if detalle_form.producto.errors %}<p class="text-xs text-red-600 mt-1">{{ detalle_form.producto.errors.0 }}</p>{% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ detalle_form.cantidad }}
+                                {% if detalle_form.cantidad.errors %}<p class="text-xs text-red-600 mt-1">{{ detalle_form.cantidad.errors.0 }}</p>{% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ detalle_form.precio_estimado }}
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ detalle_form.observacion }}
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                {% if detalles_formset.can_delete %}
+                                    <label class="inline-flex items-center cursor-pointer text-gray-400 hover:text-red-600">
+                                        {{ detalle_form.DELETE }}
+                                        <i data-lucide="trash-2" class="w-4 h-4 ml-1"></i>
+                                    </label>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr class="border-gray-200 my-8">
+
+        <!-- Botones -->
+        <div class="flex justify-end gap-3">
+            <a href="{% url 'almacen:solicitud_compra_list' %}" 
+               class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                Cancelar
+            </a>
+            <button type="submit" 
+                    class="flex items-center gap-2 px-6 py-2.5 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition shadow-sm">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                {% if form.instance.pk %}Guardar cambios{% else %}Crear solicitud{% endif %}
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Script para agregar filas al formset -->
+<script>
+function agregarFila() {
+    const totalForms = document.getElementById('id_detalles-TOTAL_FORMS');
+    const tbody = document.getElementById('detalles-tbody');
+    const formNum = parseInt(totalForms.value);
+    
+    // Copiar la primera fila existente como plantilla
+    const filaPlantilla = tbody.querySelector('.detalle-row');
+    if (!filaPlantilla) return;
+    
+    const nuevaFila = filaPlantilla.cloneNode(true);
+    
+    // Actualizar índices en los inputs
+    nuevaFila.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.name) {
+            el.name = el.name.replace(/detalles-\d+-/, `detalles-${formNum}-`);
+        }
+        if (el.id) {
+            el.id = el.id.replace(/detalles-\d+-/, `detalles-${formNum}-`);
+        }
+        // Limpiar valores para la nueva fila
+        if (el.type === 'checkbox') {
+            el.checked = false;
+        } else if (el.tagName === 'SELECT') {
+            el.selectedIndex = 0;
+        } else {
+            el.value = '';
+        }
+    });
+    
+    tbody.appendChild(nuevaFila);
+    totalForms.value = formNum + 1;
+    
+    // Reinicializar iconos de Lucide
+    lucide.createIcons();
+}
+
+// Aplicar estilos de Tailwind a los inputs generados por Django
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#detalles-tbody select, #detalles-tbody input[type="number"], #detalles-tbody input[type="text"]').forEach(el => {
+        if (el.type === 'checkbox') return;
+        el.classList.add('w-full', 'px-2', 'py-1.5', 'border', 'border-gray-300', 'rounded-lg', 'text-sm', 'focus:outline-none', 'focus:ring-2', 'focus:ring-teal-500');
+    });
+});
+</script>
+{% endblock %}

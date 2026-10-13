@@ -1,0 +1,158 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}Áreas de almacenaje - Almacén{% endblock %}
+{% block breadcrumb %}Áreas de almacenaje{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+        <div>
+            <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Organización del almacén</p>
+            <h1 class="text-3xl font-bold text-gray-800">Áreas de almacenaje</h1>
+            <p class="text-gray-500 mt-1">{{ total_areas }} áreas. Un lugar definido para cada recurso.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full md:w-auto">
+            <span class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                {{ total_areas }} áreas registradas
+            </span>
+            <a href="{% url 'almacen:area_create' %}" 
+               class="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nueva área
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <form method="get" class="flex flex-col md:flex-row gap-3">
+            <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+                       placeholder="Buscar por nombre o código de área..."
+                       class="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+            <button type="submit" class="px-6 py-2.5 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800 transition">
+                Buscar
+            </button>
+            {% if request.GET.q %}
+            <a href="{% url 'almacen:area_list' %}" class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                Limpiar
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Grid de tarjetas -->
+    {% if areas %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {% for area in areas %}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 hover:border-teal-400 hover:shadow-md transition group relative">
+            
+            <!-- Link principal: va a productos filtrados por esta área -->
+            <a href="{% url 'almacen:producto_list' %}?area={{ area.pk }}" 
+               class="absolute inset-0 z-0"
+               aria-label="Ver productos de {{ area.nombre }}"></a>
+
+            <!-- Contenido de la tarjeta (no captura clics excepto el botón editar) -->
+            <div class="relative z-10 pointer-events-none">
+                
+                <!-- Número + ícono + botón editar -->
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-teal-50 group-hover:text-teal-700 transition">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded">
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </span>
+                        
+                        <!-- Botón editar (visible al hacer hover sobre la tarjeta) -->
+                        <a href="{% url 'almacen:area_update' area.pk %}" 
+                           class="pointer-events-auto opacity-0 group-hover:opacity-100 transition w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-teal-700 hover:border-teal-300 hover:bg-teal-50"
+                           title="Editar área">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Nombre -->
+                <h3 class="font-bold text-gray-800 mb-2 truncate group-hover:text-teal-700 transition" 
+                    title="{{ area.nombre }}">
+                    {{ area.nombre }}
+                </h3>
+
+                <!-- Código -->
+                <p class="text-xs text-gray-500 mb-4 font-mono truncate">
+                    {% if area.codigo and area.codigo != "S/C" %}
+                        {{ area.codigo }}
+                    {% else %}
+                        Código por asignar (S/C)
+                    {% endif %}
+                </p>
+
+                <!-- Stats: productos y alertas -->
+                <div class="flex items-center justify-between text-xs mb-3">
+                    <span class="text-gray-600">
+                        <strong class="text-gray-800">{{ area.productos.count }}</strong>
+                        producto{{ area.productos.count|pluralize }}
+                    </span>
+                    <span class="text-gray-600">
+                        <strong class="text-gray-800">{{ area.alertas_count|default:0 }}</strong>
+                        alerta{{ area.alertas_count|default:0|pluralize }}
+                    </span>
+                </div>
+
+                <!-- Footer: Ver catálogo -->
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <span class="text-xs font-medium text-teal-600 group-hover:text-teal-800 transition">
+                        Ver catálogo
+                    </span>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-300 group-hover:text-teal-600 transition"></i>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="mt-6 bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center justify-between">
+        <p class="text-sm text-gray-500">
+            Página <span class="font-medium text-gray-700">{{ page_obj.number }}</span> 
+            de <span class="font-medium text-gray-700">{{ page_obj.paginator.num_pages }}</span>
+        </p>
+        <div class="flex gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition">Anterior</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition">Siguiente</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Estado vacío -->
+    <div class="bg-white rounded-xl border border-gray-200 py-20 text-center">
+        <div class="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="layers" class="w-8 h-8 text-teal-600"></i>
+        </div>
+        <p class="text-lg font-medium text-gray-700 mb-1">Sin áreas registradas</p>
+        <p class="text-sm text-gray-400 mb-6">Empieza creando tu primera área de almacenaje.</p>
+        <a href="{% url 'almacen:area_create' %}" 
+           class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-medium hover:bg-teal-800">
+            <i data-lucide="plus" class="w-4 h-4"></i> Crear primera área
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

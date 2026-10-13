@@ -1,0 +1,64 @@
+{% extends "almacen/base.html" %}
+
+{% block title %}Eliminar {{ producto.sku }} - Almacén{% endblock %}
+{% block breadcrumb %}Eliminar producto{% endblock %}
+
+{% block content %}
+<!-- Overlay oscuro (fondo del modal) - Como enlace para cerrar -->
+<a href="{% url 'almacen:producto_list' %}" 
+   class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 block" 
+   aria-label="Cancelar eliminación"></a>
+
+<!-- Modal (panel flotante) -->
+<div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 pointer-events-none">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative pointer-events-auto">
+        
+        <!-- Botón de cerrar (✕) -->
+        <a href="{% url 'almacen:producto_list' %}" 
+           class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition z-10">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </a>
+
+        <!-- Cuerpo del modal -->
+        <div class="p-6 pt-8 text-center">
+            
+            <!-- Icono de advertencia -->
+            <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-8 h-8 text-red-500"></i>
+            </div>
+
+            <!-- Título -->
+            <h2 class="text-xl font-bold text-gray-800 mb-2">¿Eliminar producto?</h2>
+            
+            <!-- Mensaje de advertencia -->
+            <p class="text-sm text-gray-500 mb-1">
+                Estás a punto de eliminar el siguiente producto:
+            </p>
+            <p class="text-sm font-bold text-gray-800 mb-6">
+                {{ producto.sku }} — {{ producto.nombre }}
+            </p>
+            
+            <p class="text-xs text-red-500 mb-6 flex items-center justify-center gap-1">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                Esta acción no se puede deshacer
+            </p>
+
+            <!-- Formulario con los botones -->
+            <form method="post" class="flex gap-3">
+                {% csrf_token %}
+                
+                <a href="{% url 'almacen:producto_list' %}" 
+                   class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+                    Cancelar
+                </a>
+                
+                <button type="submit" 
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Sí, eliminar
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
