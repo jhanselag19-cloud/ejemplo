@@ -32,4 +32,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD python manage.py migrate && gunicorn CMD python manage.py migrate && gunicorn almacen.wsgi:application --bind 0.0.0.0:$PORT
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "config.wsgi:application"]
