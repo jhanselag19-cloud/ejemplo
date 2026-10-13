@@ -1,0 +1,1070 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$UiG4IHXsPAUpgDZl4TffjR$1UB6AIGowptho+N+bi3s8WFKdLF28VuZXjc1m67oJvs=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "Admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "casotto68@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-07T12:56:13.551Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$tT1okUnJRAXrOh2KkTtPOR$tUswuskJKG006R+wTenfrY7u3u3Xzh+DJ1fTka3RRjg=",
+    "last_login": "2026-10-10T19:10:48.687Z",
+    "is_superuser": true,
+    "username": "gabriela",
+    "first_name": "",
+    "last_name": "",
+    "email": "jhanselag19@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-09T14:26:15.296Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$l8TtpKDukPWuGqHpsUcYJy$Lets1WKOllTl3lDnEsKxAayF3MM8xW7XA9fmoGFcfRs=",
+    "last_login": "2026-10-12T15:25:41.037Z",
+    "is_superuser": true,
+    "username": "daniel",
+    "first_name": "",
+    "last_name": "",
+    "email": "daniel@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-09T14:36:22.216Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$iADIsb2UlXZXmaFeQ7EtMB$gOILyMmp6p1PxBQkI/F2v1uxiu7f4+jHRA7sZKQ40ms=",
+    "last_login": "2026-10-09T20:48:22.893Z",
+    "is_superuser": true,
+    "username": "Gabriela",
+    "first_name": "",
+    "last_name": "",
+    "email": "jhansel20@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-09T20:40:32.640Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.565Z",
+    "actualizado_en": "2026-10-07T14:45:35.478Z",
+    "codigo": "02564245G1",
+    "nombre": "Equipo de soldadura",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.569Z",
+    "actualizado_en": "2026-10-07T14:45:35.480Z",
+    "codigo": "02596245G1",
+    "nombre": "Electricidad",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.572Z",
+    "actualizado_en": "2026-10-07T14:45:35.481Z",
+    "codigo": "42257445G1",
+    "nombre": "Repuesto de electricidad industrial",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.573Z",
+    "actualizado_en": "2026-10-07T14:45:35.483Z",
+    "codigo": "69613445G1",
+    "nombre": "Mangueras",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.575Z",
+    "actualizado_en": "2026-10-07T14:45:35.485Z",
+    "codigo": "02568445G1",
+    "nombre": "Pasadores y tornillos",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 6,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.577Z",
+    "actualizado_en": "2026-10-07T14:45:35.486Z",
+    "codigo": "02597245G1",
+    "nombre": "Máquinas",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 7,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.578Z",
+    "actualizado_en": "2026-10-07T14:45:35.487Z",
+    "codigo": "60053145G1",
+    "nombre": "Consumibles de soldadura",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 8,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.580Z",
+    "actualizado_en": "2026-10-07T14:45:35.489Z",
+    "codigo": "256273445G1",
+    "nombre": "Motores diésel",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 9,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.582Z",
+    "actualizado_en": "2026-10-07T14:45:35.491Z",
+    "codigo": "34066745G1",
+    "nombre": "Tornillos nuevos, usados y repuestos usados",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 10,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.583Z",
+    "actualizado_en": "2026-10-07T14:45:35.492Z",
+    "codigo": "02598245G1",
+    "nombre": "Guayas, cadenas y raches con cadena",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 11,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.585Z",
+    "actualizado_en": "2026-10-07T14:45:35.494Z",
+    "codigo": "68862745G1",
+    "nombre": "Consumibles ferretería",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 12,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.587Z",
+    "actualizado_en": "2026-10-07T14:45:35.496Z",
+    "codigo": "65092245G1",
+    "nombre": "Conexiones y Abrazaderas",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 13,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.589Z",
+    "actualizado_en": "2026-10-07T14:45:35.497Z",
+    "codigo": "02600345G1",
+    "nombre": "Seguridad Industrial",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 14,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.591Z",
+    "actualizado_en": "2026-10-07T14:45:35.499Z",
+    "codigo": "02575145G1",
+    "nombre": "Radiadores, alternadores y pulidoras",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 15,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.593Z",
+    "actualizado_en": "2026-10-07T14:45:35.501Z",
+    "codigo": "78410745G1",
+    "nombre": "Protector, Láminas MDF, láminas PVC y tuberías",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 16,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.595Z",
+    "actualizado_en": "2026-10-07T14:45:35.502Z",
+    "codigo": "02585345G1",
+    "nombre": "Tablas, andamios para litera",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 17,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.597Z",
+    "actualizado_en": "2026-10-07T14:45:35.504Z",
+    "codigo": "080438445G1",
+    "nombre": "Válvulas",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 18,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.598Z",
+    "actualizado_en": "2026-10-07T14:45:35.505Z",
+    "codigo": "65551745G1",
+    "nombre": "Rollo de Manto",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 19,
+  "fields": {
+    "creado_en": "2026-10-07T14:45:35.475Z",
+    "actualizado_en": "2026-10-07T14:45:35.476Z",
+    "codigo": "S/C",
+    "nombre": "Alimentos (Comedor)",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.areaalmacen",
+  "pk": 20,
+  "fields": {
+    "creado_en": "2026-10-07T14:45:35.507Z",
+    "actualizado_en": "2026-10-07T14:45:35.507Z",
+    "codigo": "70696645G1",
+    "nombre": "Pintura, materiales de albañilería",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.600Z",
+    "actualizado_en": "2026-10-07T13:56:03.600Z",
+    "nombre": "Rodamientos y bujes",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.602Z",
+    "actualizado_en": "2026-10-07T13:56:03.602Z",
+    "nombre": "Tornillería y fijaciones",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.604Z",
+    "actualizado_en": "2026-10-07T13:56:03.604Z",
+    "nombre": "Sellos y empaques",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.605Z",
+    "actualizado_en": "2026-10-07T13:56:03.605Z",
+    "nombre": "Mangueras y conexiones",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.607Z",
+    "actualizado_en": "2026-10-07T13:56:03.607Z",
+    "nombre": "Correas y cadenas",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 6,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.608Z",
+    "actualizado_en": "2026-10-07T13:56:03.608Z",
+    "nombre": "Filtros",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 7,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.610Z",
+    "actualizado_en": "2026-10-07T13:56:03.610Z",
+    "nombre": "Lubricantes y grasas",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 8,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.612Z",
+    "actualizado_en": "2026-10-07T13:56:03.612Z",
+    "nombre": "Repuestos de motor",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 9,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.614Z",
+    "actualizado_en": "2026-10-07T13:56:03.614Z",
+    "nombre": "Repuestos hidráulicos",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 10,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.616Z",
+    "actualizado_en": "2026-10-07T13:56:03.616Z",
+    "nombre": "Repuestos neumáticos",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 11,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.618Z",
+    "actualizado_en": "2026-10-07T13:56:03.618Z",
+    "nombre": "Repuestos eléctricos",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 12,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.620Z",
+    "actualizado_en": "2026-10-07T13:56:03.620Z",
+    "nombre": "Consumibles de soldadura",
+    "tipo": "insumo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 13,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.622Z",
+    "actualizado_en": "2026-10-07T13:56:03.622Z",
+    "nombre": "Herramienta manual",
+    "tipo": "herramienta",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 14,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.624Z",
+    "actualizado_en": "2026-10-07T13:56:03.624Z",
+    "nombre": "Herramienta eléctrica",
+    "tipo": "herramienta",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 15,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.627Z",
+    "actualizado_en": "2026-10-07T13:56:03.627Z",
+    "nombre": "Herramienta de medición",
+    "tipo": "herramienta",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 16,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.629Z",
+    "actualizado_en": "2026-10-07T13:56:03.629Z",
+    "nombre": "Equipo de taller",
+    "tipo": "equipo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 17,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.632Z",
+    "actualizado_en": "2026-10-07T13:56:03.632Z",
+    "nombre": "Equipo de elevación",
+    "tipo": "equipo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 18,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.635Z",
+    "actualizado_en": "2026-10-07T13:56:03.635Z",
+    "nombre": "Equipo de soldadura",
+    "tipo": "equipo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 19,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.638Z",
+    "actualizado_en": "2026-10-07T13:56:03.638Z",
+    "nombre": "Equipo de seguridad industrial",
+    "tipo": "equipo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 20,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.640Z",
+    "actualizado_en": "2026-10-07T13:56:03.640Z",
+    "nombre": "Materiales metálicos",
+    "tipo": "material",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 21,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.642Z",
+    "actualizado_en": "2026-10-07T13:56:03.642Z",
+    "nombre": "Materiales plásticos y PVC",
+    "tipo": "material",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.categoria",
+  "pk": 22,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.644Z",
+    "actualizado_en": "2026-10-07T13:56:03.644Z",
+    "nombre": "Materiales de construcción",
+    "tipo": "material",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.646Z",
+    "actualizado_en": "2026-10-07T13:56:03.646Z",
+    "codigo": "UND",
+    "nombre": "Unidad",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.648Z",
+    "actualizado_en": "2026-10-07T13:56:03.648Z",
+    "codigo": "PZA",
+    "nombre": "Pieza",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.650Z",
+    "actualizado_en": "2026-10-07T13:56:03.650Z",
+    "codigo": "JGO",
+    "nombre": "Juego",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.652Z",
+    "actualizado_en": "2026-10-07T13:56:03.652Z",
+    "codigo": "PAR",
+    "nombre": "Par",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.653Z",
+    "actualizado_en": "2026-10-07T13:56:03.653Z",
+    "codigo": "KG",
+    "nombre": "Kilogramo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 6,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.655Z",
+    "actualizado_en": "2026-10-07T13:56:03.655Z",
+    "codigo": "GR",
+    "nombre": "Gramo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 7,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.657Z",
+    "actualizado_en": "2026-10-07T13:56:03.657Z",
+    "codigo": "LT",
+    "nombre": "Litro",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 8,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.659Z",
+    "actualizado_en": "2026-10-07T13:56:03.659Z",
+    "codigo": "ML",
+    "nombre": "Mililitro",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 9,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.661Z",
+    "actualizado_en": "2026-10-07T13:56:03.661Z",
+    "codigo": "MT",
+    "nombre": "Metro",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 10,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.662Z",
+    "actualizado_en": "2026-10-07T13:56:03.662Z",
+    "codigo": "CM",
+    "nombre": "Centímetro",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 11,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.664Z",
+    "actualizado_en": "2026-10-07T13:56:03.664Z",
+    "codigo": "MM",
+    "nombre": "Milímetro",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 12,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.666Z",
+    "actualizado_en": "2026-10-07T13:56:03.666Z",
+    "codigo": "PLG",
+    "nombre": "Pulgada",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 13,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.668Z",
+    "actualizado_en": "2026-10-07T13:56:03.668Z",
+    "codigo": "PULG",
+    "nombre": "Pulgada (alt)",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 14,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.670Z",
+    "actualizado_en": "2026-10-07T13:56:03.670Z",
+    "codigo": "ROLLO",
+    "nombre": "Rollo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 15,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.672Z",
+    "actualizado_en": "2026-10-07T13:56:03.672Z",
+    "codigo": "CAJA",
+    "nombre": "Caja",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 16,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.675Z",
+    "actualizado_en": "2026-10-07T13:56:03.675Z",
+    "codigo": "BULTO",
+    "nombre": "Bulto",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 17,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.677Z",
+    "actualizado_en": "2026-10-07T13:56:03.677Z",
+    "codigo": "GALON",
+    "nombre": "Galón",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 18,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.679Z",
+    "actualizado_en": "2026-10-07T13:56:03.679Z",
+    "codigo": "CUÑETE",
+    "nombre": "Cuñete",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 19,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.682Z",
+    "actualizado_en": "2026-10-07T13:56:03.682Z",
+    "codigo": "LATA",
+    "nombre": "Lata",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 20,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.685Z",
+    "actualizado_en": "2026-10-07T13:56:03.685Z",
+    "codigo": "TUBO",
+    "nombre": "Tubo",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 21,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.687Z",
+    "actualizado_en": "2026-10-07T13:56:03.687Z",
+    "codigo": "LAMINA",
+    "nombre": "Lámina",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.unidadmedida",
+  "pk": 22,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.690Z",
+    "actualizado_en": "2026-10-07T13:56:03.690Z",
+    "codigo": "BARRA",
+    "nombre": "Barra",
+    "activa": true
+  }
+},
+{
+  "model": "almacen.estadofisico",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.692Z",
+    "actualizado_en": "2026-10-07T13:56:03.693Z",
+    "nombre": "Nuevo",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.estadofisico",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.695Z",
+    "actualizado_en": "2026-10-07T13:56:03.695Z",
+    "nombre": "Usado",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.estadofisico",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.697Z",
+    "actualizado_en": "2026-10-07T13:56:03.697Z",
+    "nombre": "Reparado",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.estadofisico",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.699Z",
+    "actualizado_en": "2026-10-07T13:56:03.699Z",
+    "nombre": "Reacondicionado",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.estadofisico",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.702Z",
+    "actualizado_en": "2026-10-07T13:56:03.702Z",
+    "nombre": "Para reparación",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.706Z",
+    "actualizado_en": "2026-10-07T13:56:03.706Z",
+    "codigo": "MANT",
+    "nombre": "Mantenimiento",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.710Z",
+    "actualizado_en": "2026-10-07T13:56:03.710Z",
+    "codigo": "TALLER",
+    "nombre": "Taller Mecánico",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.713Z",
+    "actualizado_en": "2026-10-07T13:56:03.713Z",
+    "codigo": "TAL-ELE",
+    "nombre": "Taller Eléctrico",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.716Z",
+    "actualizado_en": "2026-10-07T13:56:03.716Z",
+    "codigo": "SOLD",
+    "nombre": "Soldadura",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.718Z",
+    "actualizado_en": "2026-10-07T13:56:03.718Z",
+    "codigo": "PROD",
+    "nombre": "Producción",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 6,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.722Z",
+    "actualizado_en": "2026-10-07T13:56:03.722Z",
+    "codigo": "MAQ",
+    "nombre": "Maquinaria",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 7,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.725Z",
+    "actualizado_en": "2026-10-07T13:56:03.725Z",
+    "codigo": "HIDRAU",
+    "nombre": "Hidráulica",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 8,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.729Z",
+    "actualizado_en": "2026-10-07T13:56:03.729Z",
+    "codigo": "NEUMA",
+    "nombre": "Neumática",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 9,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.731Z",
+    "actualizado_en": "2026-10-07T13:56:03.731Z",
+    "codigo": "FLOTA",
+    "nombre": "Flota Vehicular",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.departamento",
+  "pk": 10,
+  "fields": {
+    "creado_en": "2026-10-07T13:56:03.734Z",
+    "actualizado_en": "2026-10-07T13:56:03.734Z",
+    "codigo": "OBRA",
+    "nombre": "Obra Civil",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.centrocosto",
+  "pk": 1,
+  "fields": {
+    "creado_en": "2026-10-07T14:00:40.010Z",
+    "actualizado_en": "2026-10-07T14:00:40.010Z",
+    "codigo": "CC-MANT",
+    "nombre": "Mantenimiento General",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.centrocosto",
+  "pk": 2,
+  "fields": {
+    "creado_en": "2026-10-07T14:00:40.014Z",
+    "actualizado_en": "2026-10-07T14:00:40.014Z",
+    "codigo": "CC-TALLER",
+    "nombre": "Taller Mecánico",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.centrocosto",
+  "pk": 3,
+  "fields": {
+    "creado_en": "2026-10-07T14:00:40.015Z",
+    "actualizado_en": "2026-10-07T14:00:40.015Z",
+    "codigo": "CC-FLOTA",
+    "nombre": "Flota Vehicular",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.centrocosto",
+  "pk": 4,
+  "fields": {
+    "creado_en": "2026-10-07T14:00:40.017Z",
+    "actualizado_en": "2026-10-07T14:00:40.017Z",
+    "codigo": "CC-OBRA",
+    "nombre": "Obra en Ejecución",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.centrocosto",
+  "pk": 5,
+  "fields": {
+    "creado_en": "2026-10-07T14:00:40.018Z",
+    "actualizado_en": "2026-10-07T14:00:40.018Z",
+    "codigo": "CC-PROD",
+    "nombre": "Producción",
+    "activo": true
+  }
+},
+{
+  "model": "almacen.producto",
+  "pk": 21,
+  "fields": {
+    "creado_en": "2026-10-10T19:12:35.263Z",
+    "actualizado_en": "2026-10-12T15:26:14.796Z",
+    "sku": "001",
+    "codigo_qr": "e7fb169c-b39e-4121-b6d1-06dbe0c68bc7",
+    "codigo_barras": "ssfds",
+    "nombre": "prueba",
+    "descripcion": "",
+    "numero_serie": "fs",
+    "area": 13,
+    "categoria": 8,
+    "unidad_medida": 12,
+    "estado_fisico": 4,
+    "proveedor": null,
+    "precio_unitario": "300.00",
+    "stock_actual": 54524,
+    "stock_minimo": 52445,
+    "umbral_alerta": 0,
+    "activo": true
+  }
+},
+{
+  "model": "almacen.movimientostock",
+  "pk": 53,
+  "fields": {
+    "creado_en": "2026-10-10T19:12:35.457Z",
+    "actualizado_en": "2026-10-10T19:12:35.457Z",
+    "numero": "EC-000001",
+    "tipo": "entrada_compra",
+    "estado": "confirmado",
+    "area": 13,
+    "proveedor": null,
+    "departamento": null,
+    "centro_costo": null,
+    "creado_por": [
+      "gabriela"
+    ],
+    "confirmado_por": [
+      "gabriela"
+    ],
+    "fecha_movimiento": "2026-10-10T19:12:35.453Z",
+    "motivo": "Stock inicial del producto sfedf (54524 uds.)",
+    "observacion": ""
+  }
+},
+{
+  "model": "almacen.detallemovimiento",
+  "pk": 49,
+  "fields": {
+    "creado_en": "2026-10-10T19:12:35.536Z",
+    "actualizado_en": "2026-10-10T19:12:35.536Z",
+    "movimiento": 53,
+    "producto": 21,
+    "cantidad": "54524.00",
+    "precio_unitario": "300.00",
+    "observacion": ""
+  }
+}
+]
